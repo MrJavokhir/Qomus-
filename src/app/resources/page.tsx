@@ -256,8 +256,7 @@ export default function ResourcesPage() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <a
-                                        href={previewResource.fileUrl}
-                                        download
+                                        href={`/api/resources/${previewResource.id}/download`}
                                         className="btn btn-primary text-sm"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,7 +280,7 @@ export default function ResourcesPage() {
                             <div className="flex-1 bg-gray-900">
                                 {previewResource.fileType === 'PDF' ? (
                                     <iframe
-                                        src={previewResource.fileUrl}
+                                        src={`/api/resources/${previewResource.id}/preview`}
                                         className="w-full h-full"
                                         title={getLocalizedContent(previewResource, 'title', lang)}
                                     />

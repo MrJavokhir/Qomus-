@@ -86,6 +86,7 @@ export async function PUT(
                 locationUz: validatedData.locationUz,
                 locationEn: validatedData.locationEn,
                 coverImageUrl: body.coverImageUrl !== undefined ? body.coverImageUrl : undefined,
+                registrationDeadlineAt: body.registrationDeadlineAt ? new Date(body.registrationDeadlineAt) : null,
                 status: startsAt >= now ? 'UPCOMING' : 'PAST',
             },
         });

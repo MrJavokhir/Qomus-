@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
                 locationUz: validatedData.locationUz,
                 locationEn: validatedData.locationEn,
                 coverImageUrl: body.coverImageUrl || null,
+                registrationDeadlineAt: body.registrationDeadlineAt ? new Date(body.registrationDeadlineAt) : null,
                 status: startsAt >= now ? 'UPCOMING' : 'PAST',
                 createdById: user!.userId,
             },

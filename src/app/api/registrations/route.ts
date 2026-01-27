@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser, isAdmin, isAuthenticated } from '@/lib/auth';
 import { registrationSchema } from '@/lib/validations';
 import { ZodError } from 'zod';
+import { isDeadlinePassed, computeEventStatus } from '@/lib/timezone';
 
 // GET /api/registrations - List all registrations (ADMIN only)
 export async function GET(request: NextRequest) {
@@ -19,11 +20,13 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const eventId = searchParams.get('eventId');
         const ratingStatus = searchParams.get('ratingStatus');
+        const decisionStatus = searchParams.get('decisionStatus');
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const where: any = {};
         if (eventId) where.eventId = eventId;
         if (ratingStatus) where.ratingStatus = ratingStatus;
+        if (decisionStatus) where.decisionStatus = decisionStatus;
 
         const registrations = await prisma.teamRegistration.findMany({
             where,
@@ -35,9 +38,16 @@ export async function GET(request: NextRequest) {
                         titleUz: true,
                         titleEn: true,
                         date: true,
+                        time: true,
                     },
                 },
                 leader: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
+                decidedBy: {
                     select: {
                         id: true,
                         username: true,
@@ -72,7 +82,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const validatedData = registrationSchema.parse(body);
 
-        // Check if event exists and is upcoming
+        // Check if event exists
         const event = await prisma.event.findUnique({
             where: { id: validatedData.eventId },
         });
@@ -84,9 +94,19 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (event.status !== 'UPCOMING') {
+        // Check if event is in the past (computed based on Tashkent time)
+        const eventStatus = computeEventStatus(event.date, event.time);
+        if (eventStatus === 'PAST') {
             return NextResponse.json(
                 { error: 'Cannot register for past events' },
+                { status: 400 }
+            );
+        }
+
+        // Check if registration deadline has passed
+        if (isDeadlinePassed(event.registrationDeadlineAt)) {
+            return NextResponse.json(
+                { error: 'Registration deadline has passed' },
                 { status: 400 }
             );
         }
@@ -115,6 +135,7 @@ export async function POST(request: NextRequest) {
                 membersCount: validatedData.membersCount,
                 leaderUserId: user!.userId,
                 ratingStatus: 'YELLOW',
+                decisionStatus: 'PENDING',
             },
             include: {
                 event: {

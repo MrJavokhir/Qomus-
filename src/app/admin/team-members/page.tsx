@@ -364,30 +364,66 @@ export default function AdminTeam() {
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-text-muted uppercase tracking-wider">{lang === 'uz' ? 'Rasm URL' : 'Photo URL'}</label>
+                        <label className="text-xs font-bold text-text-muted uppercase tracking-wider">{lang === 'uz' ? 'Rasm yuklash' : 'Upload Photo'}</label>
                         <div className="space-y-3">
-                            <input
-                                type="url"
-                                placeholder="https://example.com/photo.jpg"
-                                value={editingMember?.photoUrl || ''}
-                                onChange={(e) => setEditingMember({ ...editingMember, photoUrl: e.target.value })}
-                                className="input w-full text-sm"
-                            />
-                            {editingMember?.photoUrl && (
-                                <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 overflow-hidden">
-                                    <img
-                                        src={editingMember.photoUrl}
-                                        alt="Preview"
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            const target = e.target as HTMLImageElement;
-                                            target.style.display = 'none';
+                            <div className="flex items-center gap-4">
+                                {editingMember?.photoUrl && (
+                                    <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
+                                        <img
+                                            src={editingMember.photoUrl}
+                                            alt="Preview"
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                const target = e.target as HTMLImageElement;
+                                                target.style.display = 'none';
+                                            }}
+                                        />
+                                    </div>
+                                )}
+                                <div className="flex-1">
+                                    <input
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        id="photo-upload"
+                                        className="hidden"
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+
+                                            const formData = new FormData();
+                                            formData.append('file', file);
+                                            formData.append('type', 'image');
+
+                                            try {
+                                                const res = await fetch('/api/upload', {
+                                                    method: 'POST',
+                                                    body: formData,
+                                                });
+                                                if (res.ok) {
+                                                    const data = await res.json();
+                                                    setEditingMember({ ...editingMember, photoUrl: data.url });
+                                                    showToast(lang === 'uz' ? 'Rasm yuklandi' : 'Photo uploaded');
+                                                } else {
+                                                    showToast(lang === 'uz' ? 'Yuklashda xato' : 'Upload failed', 'error');
+                                                }
+                                            } catch {
+                                                showToast('Upload error', 'error');
+                                            }
                                         }}
                                     />
+                                    <label
+                                        htmlFor="photo-upload"
+                                        className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-sm"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        {editingMember?.photoUrl ? (lang === 'uz' ? 'Rasmni almashtirish' : 'Replace Photo') : (lang === 'uz' ? 'Rasm tanlash' : 'Choose Photo')}
+                                    </label>
                                 </div>
-                            )}
+                            </div>
                             <p className="text-xs text-text-muted">
-                                {lang === 'uz' ? 'Telegram, Google Drive yoki boshqa xosting URL kiriting' : 'Enter Telegram, Google Drive or other hosting URL'}
+                                {lang === 'uz' ? 'JPG, PNG yoki WebP (max 5MB)' : 'JPG, PNG or WebP (max 5MB)'}
                             </p>
                         </div>
                     </div>

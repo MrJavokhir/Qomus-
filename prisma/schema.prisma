@@ -21,29 +21,31 @@ model User {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   // Relations
-  eventsCreated     Event[]            @relation("EventCreator")
-  teamRegistrations TeamRegistration[] @relation("TeamLeader")
+  eventsCreated        Event[]            @relation("EventCreator")
+  teamRegistrations    TeamRegistration[] @relation("TeamLeader")
+  decisionsOnRegistrations TeamRegistration[] @relation("DecisionMaker")
 
   @@map("users")
 }
 
 // Event model with bilingual support
 model Event {
-  id            String   @id @default(uuid())
-  titleUz       String   @map("title_uz")
-  titleEn       String   @map("title_en")
-  descriptionUz String   @map("description_uz")
-  descriptionEn String   @map("description_en")
-  startsAt      DateTime @default(now()) @map("starts_at")
-  date          DateTime // Legacy, will migrate to startsAt
-  time          String   // Legacy, will migrate to startsAt
-  locationUz    String   @map("location_uz")
-  locationEn    String   @map("location_en")
-  coverImageUrl String?  @map("cover_image_url")
-  status        String   @default("UPCOMING")
-  createdById   String   @map("created_by_id")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id                      String    @id @default(uuid())
+  titleUz                 String    @map("title_uz")
+  titleEn                 String    @map("title_en")
+  descriptionUz           String    @map("description_uz")
+  descriptionEn           String    @map("description_en")
+  startsAt                DateTime  @default(now()) @map("starts_at")
+  date                    DateTime  // Legacy, will migrate to startsAt
+  time                    String    // Legacy, will migrate to startsAt
+  locationUz              String    @map("location_uz")
+  locationEn              String    @map("location_en")
+  coverImageUrl           String?   @map("cover_image_url")
+  status                  String    @default("UPCOMING")
+  registrationDeadlineAt  DateTime? @map("registration_deadline_at")
+  createdById             String    @map("created_by_id")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
 
   // Relations
   createdBy     User               @relation("EventCreator", fields: [createdById], references: [id])
@@ -65,21 +67,26 @@ model EventImage {
   @@map("event_images")
 }
 
-// Team registration model with rating system
+// Team registration model with rating and decision system
 model TeamRegistration {
-  id           String   @id @default(uuid())
-  eventId      String   @map("event_id")
-  teamName     String   @map("team_name")
-  membersCount Int      @map("members_count")
-  leaderUserId String   @map("leader_user_id")
-  ratingStatus String   @default("YELLOW") @map("rating_status")
-  notes        String?
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id             String    @id @default(uuid())
+  eventId        String    @map("event_id")
+  teamName       String    @map("team_name")
+  membersCount   Int       @map("members_count")
+  leaderUserId   String    @map("leader_user_id")
+  ratingStatus   String    @default("YELLOW") @map("rating_status")
+  notes          String?
+  decisionStatus String    @default("PENDING") @map("decision_status") // PENDING, ACCEPTED, DECLINED
+  decisionNote   String?   @map("decision_note")
+  decidedAt      DateTime? @map("decided_at")
+  decidedById    String?   @map("decided_by_id")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  event  Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  leader User  @relation("TeamLeader", fields: [leaderUserId], references: [id])
+  event     Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  leader    User   @relation("TeamLeader", fields: [leaderUserId], references: [id])
+  decidedBy User?  @relation("DecisionMaker", fields: [decidedById], references: [id])
 
   // Unique constraint: one team name per event
   @@unique([eventId, teamName])
