@@ -5,6 +5,15 @@ import { loginSchema } from '@/lib/validations';
 import { ZodError } from 'zod';
 
 export async function POST(request: NextRequest) {
+    // Quick env check
+    if (!process.env.DATABASE_URL) {
+        console.error('LOGIN ERROR: DATABASE_URL is not set');
+        return NextResponse.json(
+            { error: 'Server configuration error (DB)' },
+            { status: 500 }
+        );
+    }
+
     try {
         // Step 1: Parse JSON body
         let body;
@@ -40,9 +49,25 @@ export async function POST(request: NextRequest) {
                 where: { username },
             });
         } catch (error) {
-            console.error('Database error during login:', error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error('Database error during login:', errorMessage);
+
+            // Check for specific error types
+            if (errorMessage.includes("doesn't exist") || errorMessage.includes('does not exist')) {
+                return NextResponse.json(
+                    { error: 'Database tables not initialized. Please contact administrator.' },
+                    { status: 503 }
+                );
+            }
+            if (errorMessage.includes("Can't reach database") || errorMessage.includes('connection')) {
+                return NextResponse.json(
+                    { error: 'Database connection failed. Please try again later.' },
+                    { status: 503 }
+                );
+            }
+
             return NextResponse.json(
-                { error: 'Database connection error. Please try again.' },
+                { error: 'Database error. Please try again.' },
                 { status: 503 }
             );
         }
@@ -69,7 +94,7 @@ export async function POST(request: NextRequest) {
         } catch (error) {
             console.error('Password comparison error:', error);
             return NextResponse.json(
-                { error: 'Authentication service error' },
+                { error: 'Authentication error. Please try again.' },
                 { status: 500 }
             );
         }
@@ -92,7 +117,7 @@ export async function POST(request: NextRequest) {
         } catch (error) {
             console.error('Token creation error:', error);
             return NextResponse.json(
-                { error: 'Session creation failed' },
+                { error: 'Session creation failed. Please try again.' },
                 { status: 500 }
             );
         }
@@ -102,7 +127,7 @@ export async function POST(request: NextRequest) {
             await setAuthCookie(token);
         } catch (error) {
             console.error('Cookie setting error:', error);
-            // Cookie setting might fail but we can still return success with the token info
+            // Cookie setting might fail but we can still return success
         }
 
         return NextResponse.json({
@@ -115,7 +140,11 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error) {
-        console.error('Unexpected login error:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack : '';
+        console.error('Unexpected login error:', errorMessage);
+        console.error('Stack trace:', errorStack);
+
         return NextResponse.json(
             { error: 'An unexpected error occurred. Please try again.' },
             { status: 500 }
