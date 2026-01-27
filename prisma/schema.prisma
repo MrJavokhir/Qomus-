@@ -1,0 +1,169 @@
+// Prisma schema for Qomus platform
+// Using SQLite for local development
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model with role-based access
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  role         String   @default("MEMBER")
+  status       String   @default("ACTIVE") // ACTIVE, DISABLED
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  eventsCreated     Event[]            @relation("EventCreator")
+  teamRegistrations TeamRegistration[] @relation("TeamLeader")
+
+  @@map("users")
+}
+
+// Event model with bilingual support
+model Event {
+  id            String   @id @default(uuid())
+  titleUz       String   @map("title_uz")
+  titleEn       String   @map("title_en")
+  descriptionUz String   @map("description_uz")
+  descriptionEn String   @map("description_en")
+  startsAt      DateTime @default(now()) @map("starts_at")
+  date          DateTime // Legacy, will migrate to startsAt
+  time          String   // Legacy, will migrate to startsAt
+  locationUz    String   @map("location_uz")
+  locationEn    String   @map("location_en")
+  coverImageUrl String?  @map("cover_image_url")
+  status        String   @default("UPCOMING")
+  createdById   String   @map("created_by_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  createdBy     User               @relation("EventCreator", fields: [createdById], references: [id])
+  registrations TeamRegistration[]
+  gallery       EventImage[]
+
+  @@map("events")
+}
+
+// Event gallery images
+model EventImage {
+  id       String @id @default(uuid())
+  eventId  String @map("event_id")
+  imageUrl String @map("image_url")
+  order    Int    @default(0)
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("event_images")
+}
+
+// Team registration model with rating system
+model TeamRegistration {
+  id           String   @id @default(uuid())
+  eventId      String   @map("event_id")
+  teamName     String   @map("team_name")
+  membersCount Int      @map("members_count")
+  leaderUserId String   @map("leader_user_id")
+  ratingStatus String   @default("YELLOW") @map("rating_status")
+  notes        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  event  Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  leader User  @relation("TeamLeader", fields: [leaderUserId], references: [id])
+
+  // Unique constraint: one team name per event
+  @@unique([eventId, teamName])
+  @@map("team_registrations")
+}
+
+// Report model with bilingual content
+model Report {
+  id            String   @id @default(uuid())
+  titleUz       String   @map("title_uz")
+  titleEn       String   @map("title_en")
+  bodyUz        String   @map("body_uz")
+  bodyEn        String   @map("body_en")
+  coverImageUrl String?  @map("cover_image_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("reports")
+}
+
+// Resource model for documents
+model Resource {
+  id            String   @id @default(uuid())
+  titleUz       String   @map("title_uz")
+  titleEn       String   @map("title_en")
+  descriptionUz String   @map("description_uz")
+  descriptionEn String   @map("description_en")
+  fileUrl       String   @map("file_url")
+  fileType      String   @map("file_type")
+  tags          String   @default("[]")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("resources")
+}
+
+// Video model for legal short videos
+model Video {
+  id              String   @id @default(uuid())
+  titleUz         String   @map("title_uz")
+  titleEn         String   @map("title_en")
+  descriptionUz   String   @map("description_uz")
+  descriptionEn   String   @map("description_en")
+  videoUrl        String   @map("video_url")
+  sourceType      String   @default("UPLOAD") @map("source_type") // UPLOAD, URL
+  durationSeconds Int?     @map("duration_seconds")
+  thumbnailUrl    String?  @map("thumbnail_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("videos")
+}
+
+// Partner/sponsor model
+model Partner {
+  id            String   @id @default(uuid())
+  name          String
+  descriptionUz String   @map("description_uz")
+  descriptionEn String   @map("description_en")
+  logoUrl       String?  @map("logo_url")
+  linkUrl       String?  @map("link_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("partners")
+}
+
+// Team Member model for About Us page
+model TeamMember {
+  id            String   @id @default(uuid())
+  fullName      String   @map("full_name")
+  positionUz    String   @map("position_uz")
+  positionEn    String   @map("position_en")
+  bioUz         String?  @map("bio_uz")
+  bioEn         String?  @map("bio_en")
+  photoUrl      String?  @map("photo_url")
+  order         Int      @default(0)
+  status        String   @default("VISIBLE") // VISIBLE, HIDDEN
+  telegramUrl   String?  @map("telegram_url")
+  linkedinUrl   String?  @map("linkedin_url")
+  instagramUrl  String?  @map("instagram_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("team_members")
+}
+
