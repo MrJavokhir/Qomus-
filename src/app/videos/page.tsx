@@ -171,18 +171,65 @@ export default function VideosPage() {
                                     </svg>
                                 </button>
 
-                                {/* Simulated Player */}
-                                <div className="text-center px-10">
-                                    <div className="w-16 h-16 rounded-full bg-brand-600/20 flex items-center justify-center mx-auto mb-4 border border-brand-600/30">
-                                        <svg className="w-8 h-8 text-brand-400" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
-                                        </svg>
-                                    </div>
-                                    <p className="text-text-secondary text-sm">
-                                        {lang === 'uz' ? 'Video pleer yuklanmoqda...' : 'Video player is loading...'}
-                                    </p>
-                                    <p className="text-text-muted text-xs mt-2">{selectedVideo.videoUrl}</p>
-                                </div>
+                                {/* Video Player */}
+                                {(() => {
+                                    const url = selectedVideo.videoUrl;
+                                    // Detect YouTube
+                                    const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+                                    if (youtubeMatch) {
+                                        return (
+                                            <iframe
+                                                src={`https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1`}
+                                                className="w-full h-full"
+                                                title={getLocalizedContent(selectedVideo, 'title', lang)}
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            />
+                                        );
+                                    }
+                                    // Detect Vimeo
+                                    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+                                    if (vimeoMatch) {
+                                        return (
+                                            <iframe
+                                                src={`https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`}
+                                                className="w-full h-full"
+                                                title={getLocalizedContent(selectedVideo, 'title', lang)}
+                                                allow="autoplay; fullscreen; picture-in-picture"
+                                                allowFullScreen
+                                            />
+                                        );
+                                    }
+                                    // Direct video file (MP4, WebM, etc.)
+                                    return (
+                                        <video
+                                            src={url}
+                                            controls
+                                            autoPlay
+                                            preload="metadata"
+                                            className="w-full h-full"
+                                            onError={(e) => {
+                                                const target = e.target as HTMLVideoElement;
+                                                target.style.display = 'none';
+                                                target.parentElement!.innerHTML = `
+                                                    <div class="text-center p-8">
+                                                        <div class="w-16 h-16 rounded-full bg-red-600/20 flex items-center justify-center mx-auto mb-4">
+                                                            <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                                            </svg>
+                                                        </div>
+                                                        <p class="text-red-400 font-medium">${lang === 'uz' ? 'Video mavjud emas' : 'Video unavailable'}</p>
+                                                        <p class="text-text-muted text-sm mt-2">${lang === 'uz' ? 'Iltimos, keyinroq qayta urinib ko\'ring' : 'Please try again later'}</p>
+                                                    </div>
+                                                `;
+                                            }}
+                                        >
+                                            <source src={url} type="video/mp4" />
+                                            <source src={url} type="video/webm" />
+                                            {lang === 'uz' ? 'Brauzeringiz videoni qo\'llab-quvvatlamaydi' : 'Your browser does not support video playback'}
+                                        </video>
+                                    );
+                                })()}
                             </div>
 
                             <div className="p-6 md:p-8">

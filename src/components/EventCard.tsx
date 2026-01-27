@@ -39,27 +39,36 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
         >
             <Link href={`/events/${event.id}`}>
                 <div className="card card-hover h-full group flex flex-col overflow-hidden">
-                    {event.coverImageUrl && (
-                        <div className="aspect-[2/1] w-full overflow-hidden relative">
+                    {/* Cover Image Section */}
+                    <div className="aspect-[2/1] w-full overflow-hidden relative bg-gradient-to-br from-brand-600/30 to-brand-800/30">
+                        {event.coverImageUrl ? (
                             <img
                                 src={event.coverImageUrl}
                                 alt={title}
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-dark-bg/80 to-transparent opacity-60" />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                                <svg className="w-16 h-16 text-brand-400/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-dark-bg/80 to-transparent opacity-60" />
+                        {/* Date overlay */}
+                        <div className="absolute bottom-3 left-3 flex items-center gap-2 text-white">
+                            <span className="px-3 py-1 bg-brand-600 rounded-lg text-sm font-bold">
+                                {day} {month}
+                            </span>
                         </div>
-                    )}
+                    </div>
 
                     <div className="p-6 flex-1 flex flex-col">
                         <div className="flex gap-4 mb-4">
-                            {/* Date Badge */}
-                            {!event.coverImageUrl && (
-                                <div className="flex-shrink-0 w-14 h-14 bg-brand-600/20 rounded-xl flex flex-col items-center justify-center border border-brand-600/30">
-                                    <span className="text-xl font-bold text-brand-400">{day}</span>
-                                    <span className="text-xs text-brand-400 uppercase">{month}</span>
-                                </div>
-                            )}
-
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2 mb-2">
                                     <span className={`badge ${event.status === 'UPCOMING' ? 'badge-green' : 'badge-yellow'}`}>

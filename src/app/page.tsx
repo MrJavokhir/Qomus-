@@ -50,20 +50,32 @@ const staggerContainer = {
     },
 };
 
+interface HomeStats {
+    totalEvents: number;
+    upcomingEvents: number;
+    pastEvents: number;
+    totalRegistrations: number;
+    totalResources: number;
+    totalVideos: number;
+    totalUsers: number;
+}
+
 export default function HomePage() {
     const { t, lang } = useI18n();
     const [events, setEvents] = useState<Event[]>([]);
     const [resources, setResources] = useState<Resource[]>([]);
     const [videos, setVideos] = useState<Video[]>([]);
+    const [stats, setStats] = useState<HomeStats | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [eventsRes, resourcesRes, videosRes] = await Promise.all([
+                const [eventsRes, resourcesRes, videosRes, statsRes] = await Promise.all([
                     fetch('/api/events?status=UPCOMING&limit=3'),
                     fetch('/api/resources?limit=3'),
                     fetch('/api/videos?limit=3'),
+                    fetch('/api/stats/home'),
                 ]);
 
                 if (eventsRes.ok) {
@@ -77,6 +89,10 @@ export default function HomePage() {
                 if (videosRes.ok) {
                     const data = await videosRes.json();
                     setVideos(data.videos || []);
+                }
+                if (statsRes.ok) {
+                    const data = await statsRes.json();
+                    setStats(data);
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -184,10 +200,10 @@ export default function HomePage() {
                         className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6"
                     >
                         {[
-                            { value: '50+', label: lang === 'uz' ? 'Tadbirlar' : 'Events' },
-                            { value: '1000+', label: lang === 'uz' ? 'Talabalar' : 'Students' },
-                            { value: '100+', label: lang === 'uz' ? 'Resurslar' : 'Resources' },
-                            { value: '30+', label: lang === 'uz' ? 'Videolar' : 'Videos' },
+                            { value: stats?.totalEvents ?? '-', label: lang === 'uz' ? 'Tadbirlar' : 'Events' },
+                            { value: stats?.totalRegistrations ?? '-', label: lang === 'uz' ? 'Ro\'yxatlar' : 'Registrations' },
+                            { value: stats?.totalResources ?? '-', label: lang === 'uz' ? 'Resurslar' : 'Resources' },
+                            { value: stats?.totalVideos ?? '-', label: lang === 'uz' ? 'Videolar' : 'Videos' },
                         ].map((stat, i) => (
                             <div key={i} className="text-center p-6 rounded-2xl bg-white/5 border border-white/10">
                                 <div className="text-3xl md:text-4xl font-bold text-brand-400 mb-1">{stat.value}</div>

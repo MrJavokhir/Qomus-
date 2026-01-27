@@ -24,6 +24,7 @@ export default function ResourcesPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [typeFilter, setTypeFilter] = useState<'ALL' | 'PDF' | 'DOCX'>('ALL');
+    const [previewResource, setPreviewResource] = useState<Resource | null>(null);
 
     useEffect(() => {
         const fetchResources = async () => {
@@ -99,8 +100,8 @@ export default function ResourcesPage() {
                                     key={type}
                                     onClick={() => setTypeFilter(type as any)}
                                     className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all flex-1 md:flex-none ${typeFilter === type
-                                            ? 'text-text-primary'
-                                            : 'text-text-muted hover:text-text-secondary'
+                                        ? 'text-text-primary'
+                                        : 'text-text-muted hover:text-text-secondary'
                                         }`}
                                 >
                                     {typeFilter === type && (
@@ -174,6 +175,16 @@ export default function ResourcesPage() {
                                         </p>
 
                                         <div className="flex gap-2">
+                                            <button
+                                                onClick={() => setPreviewResource(res)}
+                                                className="btn btn-secondary text-sm flex-1"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                                {lang === 'uz' ? "Ko'rish" : 'Preview'}
+                                            </button>
                                             <a
                                                 href={res.fileUrl}
                                                 download
@@ -203,6 +214,91 @@ export default function ResourcesPage() {
             </main>
 
             <Footer />
+
+            {/* Preview Modal */}
+            <AnimatePresence>
+                {previewResource && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setPreviewResource(null)}
+                            className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="relative w-full max-w-5xl h-[85vh] bg-dark-surface rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex flex-col"
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between p-4 border-b border-white/10">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${previewResource.fileType === 'PDF' ? 'bg-status-red/20 text-status-red' : 'bg-brand-600/20 text-brand-400'}`}>
+                                        {previewResource.fileType === 'PDF' ? (
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            </svg>
+                                        ) : (
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-text-primary">
+                                            {getLocalizedContent(previewResource, 'title', lang)}
+                                        </h3>
+                                        <span className={`text-xs ${previewResource.fileType === 'PDF' ? 'text-status-red' : 'text-brand-400'}`}>
+                                            {previewResource.fileType}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <a
+                                        href={previewResource.fileUrl}
+                                        download
+                                        className="btn btn-primary text-sm"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        {t.common.download}
+                                    </a>
+                                    <button
+                                        onClick={() => setPreviewResource(null)}
+                                        aria-label="Close preview"
+                                        className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-white/10 transition-all"
+                                    >
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Preview Content */}
+                            <div className="flex-1 bg-gray-900">
+                                {previewResource.fileType === 'PDF' ? (
+                                    <iframe
+                                        src={previewResource.fileUrl}
+                                        className="w-full h-full"
+                                        title={getLocalizedContent(previewResource, 'title', lang)}
+                                    />
+                                ) : (
+                                    // Use Google Docs Viewer for DOCX
+                                    <iframe
+                                        src={`https://docs.google.com/viewer?url=${encodeURIComponent(previewResource.fileUrl)}&embedded=true`}
+                                        className="w-full h-full"
+                                        title={getLocalizedContent(previewResource, 'title', lang)}
+                                    />
+                                )}
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
