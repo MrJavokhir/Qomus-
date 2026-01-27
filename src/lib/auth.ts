@@ -2,7 +2,13 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-in-production';
+// Validate required environment variables at module load
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: JWT_SECRET environment variable is required in production');
+}
+
+const EFFECTIVE_JWT_SECRET = JWT_SECRET || 'fallback-secret-for-development-only';
 const COOKIE_NAME = 'qomus_session';
 
 export type UserRole = 'MEMBER' | 'ADMIN';
@@ -24,12 +30,12 @@ export async function comparePassword(password: string, hash: string): Promise<b
 
 // JWT functions
 export function signToken(payload: JWTPayload): string {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+    return jwt.sign(payload, EFFECTIVE_JWT_SECRET, { expiresIn: '7d' });
 }
 
 export function verifyToken(token: string): JWTPayload | null {
     try {
-        return jwt.verify(token, JWT_SECRET) as JWTPayload;
+        return jwt.verify(token, EFFECTIVE_JWT_SECRET) as JWTPayload;
     } catch {
         return null;
     }
@@ -59,9 +65,14 @@ export async function removeAuthCookie(): Promise<void> {
 
 // Get current user from cookies
 export async function getCurrentUser(): Promise<JWTPayload | null> {
-    const token = await getAuthCookie();
-    if (!token) return null;
-    return verifyToken(token);
+    try {
+        const token = await getAuthCookie();
+        if (!token) return null;
+        return verifyToken(token);
+    } catch (error) {
+        console.error('Error getting current user:', error);
+        return null;
+    }
 }
 
 // Check if user is admin

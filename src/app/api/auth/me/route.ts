@@ -14,20 +14,38 @@ export async function GET() {
         }
 
         // Get fresh user data from database
-        const user = await prisma.user.findUnique({
-            where: { id: tokenPayload.userId },
-            select: {
-                id: true,
-                username: true,
-                role: true,
-                createdAt: true,
-            },
-        });
+        let user;
+        try {
+            user = await prisma.user.findUnique({
+                where: { id: tokenPayload.userId },
+                select: {
+                    id: true,
+                    username: true,
+                    role: true,
+                    status: true,
+                    createdAt: true,
+                },
+            });
+        } catch (error) {
+            console.error('Database error in /me:', error);
+            return NextResponse.json(
+                { error: 'Database connection error' },
+                { status: 503 }
+            );
+        }
 
         if (!user) {
             return NextResponse.json(
                 { error: 'User not found' },
                 { status: 404 }
+            );
+        }
+
+        // Check if user is disabled
+        if (user.status === 'DISABLED') {
+            return NextResponse.json(
+                { error: 'Account disabled' },
+                { status: 403 }
             );
         }
 
