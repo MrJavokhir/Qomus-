@@ -167,3 +167,14 @@ model TeamMember {
   @@map("team_members")
 }
 
+// Editable site sections (e.g., team section title/description)
+model SiteSection {
+  key       String   @id
+  titleUz   String   @map("title_uz")
+  titleEn   String   @map("title_en")
+  bodyUz    String   @map("body_uz")
+  bodyEn    String   @map("body_en")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_sections")
+}

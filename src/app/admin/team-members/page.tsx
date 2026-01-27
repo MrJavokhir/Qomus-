@@ -29,10 +29,19 @@ export default function AdminTeam() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingMember, setEditingMember] = useState<Partial<TeamMember> | null>(null);
     const [submitting, setSubmitting] = useState(false);
-    const [uploading, setUploading] = useState(false);
+
+    // Team Section State
+    const [sectionEditing, setSectionEditing] = useState(false);
+    const [teamSection, setTeamSection] = useState({
+        titleUz: 'Bizning jamoa',
+        titleEn: 'Our Team',
+        bodyUz: 'Qomus platformasi ortidagi professional jamoa bilan tanishing',
+        bodyEn: 'Meet the professional team behind the Qomus platform',
+    });
 
     useEffect(() => {
         fetchMembers();
+        fetchTeamSection();
     }, []);
 
     const fetchMembers = async () => {
@@ -46,6 +55,42 @@ export default function AdminTeam() {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchTeamSection = async () => {
+        try {
+            const res = await fetch('/api/site-sections/team_section');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.section) {
+                    setTeamSection(data.section);
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleSaveSection = async () => {
+        setSubmitting(true);
+        try {
+            const res = await fetch('/api/site-sections/team_section', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(teamSection),
+            });
+            if (res.ok) {
+                showToast(lang === 'uz' ? 'Bo\'lim saqlandi' : 'Section saved');
+                setSectionEditing(false);
+            } else {
+                showToast('Error saving section', 'error');
+            }
+        } catch (err) {
+            showToast('Error', 'error');
+            console.error(err);
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -87,24 +132,6 @@ export default function AdminTeam() {
         }
     };
 
-    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        setUploading(true);
-        const formData = new FormData();
-        formData.append('file', file);
-        try {
-            const res = await fetch('/api/upload', { method: 'POST', body: formData });
-            if (res.ok) {
-                const data = await res.json();
-                setEditingMember({ ...editingMember, photoUrl: data.url });
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setUploading(false);
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -149,6 +176,97 @@ export default function AdminTeam() {
                     </svg>
                     {lang === 'uz' ? 'Qo\'shish' : 'Add Member'}
                 </button>
+            </div>
+
+            {/* Team Section Editor */}
+            <div className="card border-white/10 p-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="font-semibold text-text-primary">
+                        {lang === 'uz' ? "Bo'lim matni" : 'Section Text'}
+                    </h2>
+                    {!sectionEditing ? (
+                        <button
+                            onClick={() => setSectionEditing(true)}
+                            className="btn btn-secondary text-xs"
+                        >
+                            {lang === 'uz' ? 'Tahrirlash' : 'Edit'}
+                        </button>
+                    ) : (
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setSectionEditing(false)}
+                                className="btn btn-secondary text-xs"
+                            >
+                                {lang === 'uz' ? 'Bekor qilish' : 'Cancel'}
+                            </button>
+                            <button
+                                onClick={handleSaveSection}
+                                disabled={submitting}
+                                className="btn btn-primary text-xs"
+                            >
+                                {submitting ? '...' : (lang === 'uz' ? 'Saqlash' : 'Save')}
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {sectionEditing ? (
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                            <div>
+                                <label className="text-xs font-bold text-text-muted uppercase tracking-wider">Title (UZ)</label>
+                                <input
+                                    type="text"
+                                    value={teamSection.titleUz}
+                                    onChange={(e) => setTeamSection({ ...teamSection, titleUz: e.target.value })}
+                                    className="input w-full mt-1"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-text-muted uppercase tracking-wider">Description (UZ)</label>
+                                <textarea
+                                    value={teamSection.bodyUz}
+                                    onChange={(e) => setTeamSection({ ...teamSection, bodyUz: e.target.value })}
+                                    className="input w-full mt-1"
+                                    rows={3}
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-3">
+                            <div>
+                                <label className="text-xs font-bold text-text-muted uppercase tracking-wider">Title (EN)</label>
+                                <input
+                                    type="text"
+                                    value={teamSection.titleEn}
+                                    onChange={(e) => setTeamSection({ ...teamSection, titleEn: e.target.value })}
+                                    className="input w-full mt-1"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-text-muted uppercase tracking-wider">Description (EN)</label>
+                                <textarea
+                                    value={teamSection.bodyEn}
+                                    onChange={(e) => setTeamSection({ ...teamSection, bodyEn: e.target.value })}
+                                    className="input w-full mt-1"
+                                    rows={3}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-xs text-text-muted mb-1">UZ</p>
+                            <p className="font-medium text-text-primary">{teamSection.titleUz}</p>
+                            <p className="text-sm text-text-secondary mt-1">{teamSection.bodyUz}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs text-text-muted mb-1">EN</p>
+                            <p className="font-medium text-text-primary">{teamSection.titleEn}</p>
+                            <p className="text-sm text-text-secondary mt-1">{teamSection.bodyEn}</p>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="card border-white/10 overflow-hidden">
@@ -246,21 +364,31 @@ export default function AdminTeam() {
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-text-muted uppercase tracking-wider">{lang === 'uz' ? 'Rasm' : 'Photo'}</label>
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-xl bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
-                                {editingMember?.photoUrl ? <img src={editingMember.photoUrl} alt="" className="w-full h-full object-cover" /> : null}
-                            </div>
+                        <label className="text-xs font-bold text-text-muted uppercase tracking-wider">{lang === 'uz' ? 'Rasm URL' : 'Photo URL'}</label>
+                        <div className="space-y-3">
                             <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileUpload}
-                                className="hidden"
-                                id="photo-upload"
+                                type="url"
+                                placeholder="https://example.com/photo.jpg"
+                                value={editingMember?.photoUrl || ''}
+                                onChange={(e) => setEditingMember({ ...editingMember, photoUrl: e.target.value })}
+                                className="input w-full text-sm"
                             />
-                            <label htmlFor="photo-upload" className="btn btn-secondary text-xs cursor-pointer">
-                                {uploading ? '...' : (lang === 'uz' ? 'Rasm tanlash' : 'Choose Photo')}
-                            </label>
+                            {editingMember?.photoUrl && (
+                                <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 overflow-hidden">
+                                    <img
+                                        src={editingMember.photoUrl}
+                                        alt="Preview"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.style.display = 'none';
+                                        }}
+                                    />
+                                </div>
+                            )}
+                            <p className="text-xs text-text-muted">
+                                {lang === 'uz' ? 'Telegram, Google Drive yoki boshqa xosting URL kiriting' : 'Enter Telegram, Google Drive or other hosting URL'}
+                            </p>
                         </div>
                     </div>
 
@@ -317,7 +445,7 @@ export default function AdminTeam() {
                     <div className="pt-6">
                         <button
                             type="submit"
-                            disabled={submitting || uploading}
+                            disabled={submitting}
                             className="btn btn-primary w-full py-4 text-base shadow-glow"
                         >
                             {submitting ? '...' : (lang === 'uz' ? 'Saqlash' : 'Save Member')}

@@ -19,23 +19,38 @@ interface TeamMember {
     instagramUrl: string;
 }
 
+interface TeamSectionContent {
+    titleUz: string;
+    titleEn: string;
+    bodyUz: string;
+    bodyEn: string;
+}
+
 export default function AboutPage() {
     const { t, lang } = useI18n();
     const [team, setTeam] = useState<TeamMember[]>([]);
+    const [teamSection, setTeamSection] = useState<TeamSectionContent | null>(null);
 
     useEffect(() => {
-        const fetchTeam = async () => {
+        const fetchData = async () => {
             try {
-                const res = await fetch('/api/team-members?visible=true');
-                if (res.ok) {
-                    const data = await res.json();
+                const [teamRes, sectionRes] = await Promise.all([
+                    fetch('/api/team-members?visible=true'),
+                    fetch('/api/site-sections/team_section')
+                ]);
+                if (teamRes.ok) {
+                    const data = await teamRes.json();
                     setTeam(data.members || []);
+                }
+                if (sectionRes.ok) {
+                    const data = await sectionRes.json();
+                    setTeamSection(data.section);
                 }
             } catch (err) {
                 console.error(err);
             }
         };
-        fetchTeam();
+        fetchData();
     }, []);
 
     const content = {
@@ -45,8 +60,8 @@ export default function AboutPage() {
             mission: "Bizning missiyamiz",
             missionText: "Talabalarga nazariy bilimlarini amaliyotda qo'llash uchun platforma yaratish, ularning professional mahoratini oshirish va jamiyatda huquqiy madaniyatni yuksaltirish.",
             values: "Bizning qadriyatlarimiz",
-            teamTitle: "Bizning jamoa",
-            teamSubtitle: "Qomus platformasi ortidagi professional jamoa bilan tanishing",
+            teamTitle: teamSection ? teamSection.titleUz : 'Bizning jamoa',
+            teamSubtitle: teamSection ? teamSection.bodyUz : 'Qomus platformasi ortidagi professional jamoa bilan tanishing',
             valuesList: [
                 { title: "Bilim", dec: "Har doim yangilikka intilish va bilimlarni ulashish." },
                 { title: "Shaffoflik", dec: "Barcha jarayonlarda ochiqlik va adolatni ta'minlash." },
@@ -59,8 +74,8 @@ export default function AboutPage() {
             mission: "Our Mission",
             missionText: "To create a platform for students to apply their theoretical knowledge in practice, improve their professional skills, and elevate legal culture in society.",
             values: "Our Values",
-            teamTitle: "Our Team",
-            teamSubtitle: "Meet the professional community behind the Qomus platform",
+            teamTitle: teamSection ? teamSection.titleEn : 'Our Team',
+            teamSubtitle: teamSection ? teamSection.bodyEn : 'Meet the professional team behind the Qomus platform',
             valuesList: [
                 { title: "Knowledge", dec: "Always striving for innovation and sharing knowledge." },
                 { title: "Transparency", dec: "Ensuring openness and fairness in all processes." },
