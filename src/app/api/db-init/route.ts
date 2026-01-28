@@ -21,235 +21,198 @@ export async function GET(request: NextRequest) {
         await prisma.$connect();
         results.push('✅ Database connected');
 
-        // Check if tables exist
-        let tablesExist = false;
+        // Create tables if they don't exist, or update them
         try {
-            await prisma.user.count();
-            tablesExist = true;
-            results.push('✅ Tables already exist');
-        } catch {
-            results.push('⚠️ Tables do not exist - creating...');
-        }
+            // Create enums first (PostgreSQL only)
+            await prisma.$executeRaw`DO $$ BEGIN CREATE TYPE "UserRole" AS ENUM ('MEMBER', 'ADMIN'); EXCEPTION WHEN duplicate_object THEN null; END $$;`;
+            await prisma.$executeRaw`DO $$ BEGIN CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'DISABLED'); EXCEPTION WHEN duplicate_object THEN null; END $$;`;
+            await prisma.$executeRaw`DO $$ BEGIN CREATE TYPE "EventStatus" AS ENUM ('UPCOMING', 'PAST'); EXCEPTION WHEN duplicate_object THEN null; END $$;`;
+            await prisma.$executeRaw`DO $$ BEGIN CREATE TYPE "RatingStatus" AS ENUM ('GREEN', 'YELLOW', 'RED'); EXCEPTION WHEN duplicate_object THEN null; END $$;`;
+            await prisma.$executeRaw`DO $$ BEGIN CREATE TYPE "FileType" AS ENUM ('PDF', 'DOCX', 'OTHER'); EXCEPTION WHEN duplicate_object THEN null; END $$;`;
+            await prisma.$executeRaw`DO $$ BEGIN CREATE TYPE "VideoSourceType" AS ENUM ('UPLOAD', 'URL'); EXCEPTION WHEN duplicate_object THEN null; END $$;`;
+            results.push('✅ Enums checked/created');
 
-        // Create tables if they don't exist
-        if (!tablesExist) {
-            try {
-                // Create enums
-                await prisma.$executeRaw`
-                    DO $$ BEGIN
-                        CREATE TYPE "UserRole" AS ENUM ('MEMBER', 'ADMIN');
-                    EXCEPTION
-                        WHEN duplicate_object THEN null;
-                    END $$;
-                `;
-                await prisma.$executeRaw`
-                    DO $$ BEGIN
-                        CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'DISABLED');
-                    EXCEPTION
-                        WHEN duplicate_object THEN null;
-                    END $$;
-                `;
-                await prisma.$executeRaw`
-                    DO $$ BEGIN
-                        CREATE TYPE "EventStatus" AS ENUM ('UPCOMING', 'PAST');
-                    EXCEPTION
-                        WHEN duplicate_object THEN null;
-                    END $$;
-                `;
-                await prisma.$executeRaw`
-                    DO $$ BEGIN
-                        CREATE TYPE "RatingStatus" AS ENUM ('GREEN', 'YELLOW', 'RED');
-                    EXCEPTION
-                        WHEN duplicate_object THEN null;
-                    END $$;
-                `;
-                await prisma.$executeRaw`
-                    DO $$ BEGIN
-                        CREATE TYPE "FileType" AS ENUM ('PDF', 'DOCX', 'OTHER');
-                    EXCEPTION
-                        WHEN duplicate_object THEN null;
-                    END $$;
-                `;
-                await prisma.$executeRaw`
-                    DO $$ BEGIN
-                        CREATE TYPE "VideoSourceType" AS ENUM ('UPLOAD', 'URL');
-                    EXCEPTION
-                        WHEN duplicate_object THEN null;
-                    END $$;
-                `;
-                results.push('✅ Enums created');
+            // 1. Users Table
+            await prisma.$executeRaw`
+                CREATE TABLE IF NOT EXISTS "users" (
+                    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+                    "username" TEXT NOT NULL,
+                    "password_hash" TEXT NOT NULL,
+                    "role" "UserRole" NOT NULL DEFAULT 'MEMBER',
+                    "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
+                    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+                );
+            `;
+            await prisma.$executeRaw`CREATE UNIQUE INDEX IF NOT EXISTS "users_username_key" ON "users"("username");`;
+            results.push('✅ Users table ready');
 
-                // Create tables using raw SQL
-                await prisma.$executeRaw`
-                    CREATE TABLE IF NOT EXISTS "users" (
-                        "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
-                        "username" TEXT NOT NULL,
-                        "password_hash" TEXT NOT NULL,
-                        "role" "UserRole" NOT NULL DEFAULT 'MEMBER',
-                        "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
-                        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        CONSTRAINT "users_pkey" PRIMARY KEY ("id")
-                    );
-                `;
-                await prisma.$executeRaw`CREATE UNIQUE INDEX IF NOT EXISTS "users_username_key" ON "users"("username");`;
-                results.push('✅ Users table created');
+            // 2. Events Table
+            await prisma.$executeRaw`
+                CREATE TABLE IF NOT EXISTS "events" (
+                    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+                    "title_uz" TEXT NOT NULL,
+                    "title_en" TEXT NOT NULL,
+                    "description_uz" TEXT NOT NULL,
+                    "description_en" TEXT NOT NULL,
+                    "date" TIMESTAMP(3) NOT NULL,
+                    "time" TEXT NOT NULL,
+                    "location_uz" TEXT NOT NULL,
+                    "location_en" TEXT NOT NULL,
+                    "created_by_id" TEXT NOT NULL,
+                    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT "events_pkey" PRIMARY KEY ("id")
+                );
+            `;
+            // Add missing columns to Events
+            await prisma.$executeRaw`ALTER TABLE "events" ADD COLUMN IF NOT EXISTS "starts_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;`;
+            await prisma.$executeRaw`ALTER TABLE "events" ADD COLUMN IF NOT EXISTS "status" TEXT NOT NULL DEFAULT 'UPCOMING';`;
+            await prisma.$executeRaw`ALTER TABLE "events" ADD COLUMN IF NOT EXISTS "cover_image_url" TEXT;`;
+            await prisma.$executeRaw`ALTER TABLE "events" ADD COLUMN IF NOT EXISTS "registration_deadline_at" TIMESTAMP(3);`;
+            results.push('✅ Events table ready (and updated)');
 
-                await prisma.$executeRaw`
-                    CREATE TABLE IF NOT EXISTS "events" (
-                        "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
-                        "title_uz" TEXT NOT NULL,
-                        "title_en" TEXT NOT NULL,
-                        "description_uz" TEXT NOT NULL,
-                        "description_en" TEXT NOT NULL,
-                        "starts_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        "date" TIMESTAMP(3) NOT NULL,
-                        "time" TEXT NOT NULL,
-                        "location_uz" TEXT NOT NULL,
-                        "location_en" TEXT NOT NULL,
-                        "status" TEXT NOT NULL DEFAULT 'UPCOMING',
-                        "cover_image_url" TEXT,
-                        "registration_deadline_at" TIMESTAMP(3),
-                        "created_by_id" TEXT NOT NULL,
-                        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        CONSTRAINT "events_pkey" PRIMARY KEY ("id")
-                    );
-                `;
-                results.push('✅ Events table created');
+            // 3. Event Images
+            await prisma.$executeRaw`
+                CREATE TABLE IF NOT EXISTS "event_images" (
+                    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+                    "event_id" TEXT NOT NULL,
+                    "image_url" TEXT NOT NULL,
+                    "order" INTEGER NOT NULL DEFAULT 0,
+                    CONSTRAINT "event_images_pkey" PRIMARY KEY ("id")
+                );
+            `;
+            results.push('✅ Event images table ready');
 
-                await prisma.$executeRaw`
-                    CREATE TABLE IF NOT EXISTS "event_images" (
-                        "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
-                        "event_id" TEXT NOT NULL,
-                        "image_url" TEXT NOT NULL,
-                        "order" INTEGER NOT NULL DEFAULT 0,
-                        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        CONSTRAINT "event_images_pkey" PRIMARY KEY ("id")
-                    );
-                `;
-                results.push('✅ Event images table created');
+            // 4. Team Registrations
+            await prisma.$executeRaw`
+                CREATE TABLE IF NOT EXISTS "team_registrations" (
+                    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+                    "event_id" TEXT NOT NULL,
+                    "team_name" TEXT NOT NULL,
+                    "members_count" INTEGER NOT NULL,
+                    "leader_user_id" TEXT NOT NULL,
+                    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT "team_registrations_pkey" PRIMARY KEY ("id")
+                );
+            `;
+            // Add missing columns to Team Registrations
+            await prisma.$executeRaw`ALTER TABLE "team_registrations" ADD COLUMN IF NOT EXISTS "rating_status" TEXT NOT NULL DEFAULT 'YELLOW';`;
+            await prisma.$executeRaw`ALTER TABLE "team_registrations" ADD COLUMN IF NOT EXISTS "notes" TEXT;`;
+            await prisma.$executeRaw`ALTER TABLE "team_registrations" ADD COLUMN IF NOT EXISTS "decision_status" TEXT NOT NULL DEFAULT 'PENDING';`;
+            await prisma.$executeRaw`ALTER TABLE "team_registrations" ADD COLUMN IF NOT EXISTS "decision_note" TEXT;`;
+            await prisma.$executeRaw`ALTER TABLE "team_registrations" ADD COLUMN IF NOT EXISTS "decided_at" TIMESTAMP(3);`;
+            await prisma.$executeRaw`ALTER TABLE "team_registrations" ADD COLUMN IF NOT EXISTS "decided_by_id" TEXT;`;
+            results.push('✅ Team registrations table ready (and updated)');
 
-                await prisma.$executeRaw`
-                    CREATE TABLE IF NOT EXISTS "team_registrations" (
-                        "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
-                        "event_id" TEXT NOT NULL,
-                        "team_name" TEXT NOT NULL,
-                        "members_count" INTEGER NOT NULL,
-                        "leader_user_id" TEXT NOT NULL,
-                        "rating_status" TEXT NOT NULL DEFAULT 'YELLOW',
-                        "notes" TEXT,
-                        "decision_status" TEXT NOT NULL DEFAULT 'PENDING',
-                        "decision_note" TEXT,
-                        "decided_at" TIMESTAMP(3),
-                        "decided_by_id" TEXT,
-                        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        CONSTRAINT "team_registrations_pkey" PRIMARY KEY ("id")
-                    );
-                `;
-                results.push('✅ Team registrations table created');
+            // 5. Reports
+            await prisma.$executeRaw`
+                CREATE TABLE IF NOT EXISTS "reports" (
+                    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+                    "title_uz" TEXT NOT NULL,
+                    "title_en" TEXT NOT NULL,
+                    "body_uz" TEXT NOT NULL,
+                    "body_en" TEXT NOT NULL,
+                    "cover_image_url" TEXT,
+                    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT "reports_pkey" PRIMARY KEY ("id")
+                );
+            `;
+            results.push('✅ Reports table ready');
 
-                await prisma.$executeRaw`
-                    CREATE TABLE IF NOT EXISTS "reports" (
-                        "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
-                        "title_uz" TEXT NOT NULL,
-                        "title_en" TEXT NOT NULL,
-                        "body_uz" TEXT NOT NULL,
-                        "body_en" TEXT NOT NULL,
-                        "cover_image_url" TEXT,
-                        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        CONSTRAINT "reports_pkey" PRIMARY KEY ("id")
-                    );
-                `;
-                results.push('✅ Reports table created');
+            // 6. Resources
+            await prisma.$executeRaw`
+                CREATE TABLE IF NOT EXISTS "resources" (
+                    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+                    "title_uz" TEXT NOT NULL,
+                    "title_en" TEXT NOT NULL,
+                    "description_uz" TEXT NOT NULL,
+                    "description_en" TEXT NOT NULL,
+                    "file_url" TEXT NOT NULL,
+                    "file_type" TEXT NOT NULL DEFAULT 'PDF',
+                    "tags" TEXT NOT NULL DEFAULT '[]',
+                    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT "resources_pkey" PRIMARY KEY ("id")
+                );
+            `;
+            results.push('✅ Resources table ready');
 
-                await prisma.$executeRaw`
-                    CREATE TABLE IF NOT EXISTS "resources" (
-                        "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
-                        "title_uz" TEXT NOT NULL,
-                        "title_en" TEXT NOT NULL,
-                        "description_uz" TEXT NOT NULL,
-                        "description_en" TEXT NOT NULL,
-                        "file_url" TEXT NOT NULL,
-                        "file_type" "FileType" NOT NULL DEFAULT 'PDF',
-                        "tags" JSONB NOT NULL DEFAULT '[]',
-                        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        CONSTRAINT "resources_pkey" PRIMARY KEY ("id")
-                    );
-                `;
-                results.push('✅ Resources table created');
+            // 7. Videos
+            await prisma.$executeRaw`
+                CREATE TABLE IF NOT EXISTS "videos" (
+                    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+                    "title_uz" TEXT NOT NULL,
+                    "title_en" TEXT NOT NULL,
+                    "description_uz" TEXT NOT NULL,
+                    "description_en" TEXT NOT NULL,
+                    "video_url" TEXT NOT NULL,
+                    "source_type" TEXT NOT NULL DEFAULT 'URL',
+                    "duration_seconds" INTEGER,
+                    "thumbnail_url" TEXT,
+                    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT "videos_pkey" PRIMARY KEY ("id")
+                );
+            `;
+            results.push('✅ Videos table ready');
 
-                await prisma.$executeRaw`
-                    CREATE TABLE IF NOT EXISTS "videos" (
-                        "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
-                        "title_uz" TEXT NOT NULL,
-                        "title_en" TEXT NOT NULL,
-                        "description_uz" TEXT NOT NULL,
-                        "description_en" TEXT NOT NULL,
-                        "video_url" TEXT NOT NULL,
-                        "source_type" "VideoSourceType" NOT NULL DEFAULT 'URL',
-                        "duration_seconds" INTEGER,
-                        "thumbnail_url" TEXT,
-                        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        CONSTRAINT "videos_pkey" PRIMARY KEY ("id")
-                    );
-                `;
-                results.push('✅ Videos table created');
+            // 8. Partners
+            await prisma.$executeRaw`
+                CREATE TABLE IF NOT EXISTS "partners" (
+                    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+                    "name" TEXT NOT NULL,
+                    "description_uz" TEXT NOT NULL,
+                    "description_en" TEXT NOT NULL,
+                    "logo_url" TEXT,
+                    "link_url" TEXT,
+                    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT "partners_pkey" PRIMARY KEY ("id")
+                );
+            `;
+            results.push('✅ Partners table ready');
 
-                await prisma.$executeRaw`
-                    CREATE TABLE IF NOT EXISTS "partners" (
-                        "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
-                        "name" TEXT NOT NULL,
-                        "description_uz" TEXT NOT NULL,
-                        "description_en" TEXT NOT NULL,
-                        "logo_url" TEXT,
-                        "link_url" TEXT,
-                        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        CONSTRAINT "partners_pkey" PRIMARY KEY ("id")
-                    );
-                `;
-                results.push('✅ Partners table created');
+            // 9. Team Members
+            await prisma.$executeRaw`
+                CREATE TABLE IF NOT EXISTS "team_members" (
+                    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+                    "full_name" TEXT NOT NULL,
+                    "position_uz" TEXT NOT NULL,
+                    "position_en" TEXT NOT NULL,
+                    "bio_uz" TEXT DEFAULT '',
+                    "bio_en" DEFAULT '',
+                    "photo_url" TEXT DEFAULT '',
+                    "status" TEXT NOT NULL DEFAULT 'VISIBLE',
+                    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT "team_members_pkey" PRIMARY KEY ("id")
+                );
+            `;
+            // Add missing columns to Team Members
+            await prisma.$executeRaw`ALTER TABLE "team_members" ADD COLUMN IF NOT EXISTS "telegram_url" TEXT;`;
+            await prisma.$executeRaw`ALTER TABLE "team_members" ADD COLUMN IF NOT EXISTS "linkedin_url" TEXT;`;
+            await prisma.$executeRaw`ALTER TABLE "team_members" ADD COLUMN IF NOT EXISTS "instagram_url" TEXT;`;
+            await prisma.$executeRaw`ALTER TABLE "team_members" ADD COLUMN IF NOT EXISTS "order" INTEGER DEFAULT 0;`;
+            results.push('✅ Team members table ready');
 
-                await prisma.$executeRaw`
-                    CREATE TABLE IF NOT EXISTS "team_members" (
-                        "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
-                        "full_name" TEXT NOT NULL,
-                        "position_uz" TEXT NOT NULL,
-                        "position_en" TEXT NOT NULL,
-                        "bio_uz" TEXT NOT NULL DEFAULT '',
-                        "bio_en" TEXT NOT NULL DEFAULT '',
-                        "photo_url" TEXT NOT NULL DEFAULT '',
-                        "telegram_url" TEXT NOT NULL DEFAULT '',
-                        "linkedin_url" TEXT NOT NULL DEFAULT '',
-                        "instagram_url" TEXT NOT NULL DEFAULT '',
-                        "order" INTEGER NOT NULL DEFAULT 0,
-                        "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
-                        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        CONSTRAINT "team_members_pkey" PRIMARY KEY ("id")
-                    );
-                `;
-                results.push('✅ Team members table created');
+            // 10. Site Sections
+            await prisma.$executeRaw`
+                CREATE TABLE IF NOT EXISTS "site_sections" (
+                    "key" TEXT NOT NULL,
+                    "title_uz" TEXT NOT NULL,
+                    "title_en" TEXT NOT NULL,
+                    "body_uz" TEXT NOT NULL,
+                    "body_en" TEXT NOT NULL,
+                    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT "site_sections_pkey" PRIMARY KEY ("key")
+                );
+            `;
+            results.push('✅ Site sections table ready');
 
-                await prisma.$executeRaw`
-                    CREATE TABLE IF NOT EXISTS "site_sections" (
-                        "key" TEXT NOT NULL,
-                        "title_uz" TEXT NOT NULL,
-                        "title_en" TEXT NOT NULL,
-                        "body_uz" TEXT NOT NULL,
-                        "body_en" TEXT NOT NULL,
-                        "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        CONSTRAINT "site_sections_pkey" PRIMARY KEY ("key")
-                    );
-                `;
-                results.push('✅ Site sections table created');
-
-                results.push('✅ All tables created successfully!');
-            } catch (schemaError) {
-                const errorMsg = schemaError instanceof Error ? schemaError.message : String(schemaError);
-                results.push(`❌ Schema creation error: ${errorMsg}`);
-                return NextResponse.json({ success: false, results, error: errorMsg }, { status: 500 });
-            }
+            results.push('🚀 Database schema fully updated!');
+        } catch (schemaError) {
+            const errorMsg = schemaError instanceof Error ? schemaError.message : String(schemaError);
+            results.push(`❌ Schema update error: ${errorMsg}`);
+            return NextResponse.json({ success: false, results, error: errorMsg }, { status: 500 });
         }
 
         // Create admin user
