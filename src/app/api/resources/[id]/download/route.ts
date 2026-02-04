@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
 // GET /api/resources/[id]/download - Download resource file
 export async function GET(
@@ -43,8 +45,36 @@ export async function GET(
             }
         }
 
-        // For local files (legacy), redirect to the file
-        return NextResponse.redirect(new URL(fileUrl, request.url));
+        // Handle local files - serve from filesystem
+        const localPath = fileUrl.startsWith('/uploads/')
+            ? join(process.cwd(), 'public', fileUrl)
+            : join(process.cwd(), 'public', 'uploads', fileUrl);
+
+        try {
+            const fileBuffer = await readFile(localPath);
+
+            // Determine content type based on file extension
+            const ext = fileUrl.split('.').pop()?.toLowerCase();
+            const contentTypeMap: Record<string, string> = {
+                'pdf': 'application/pdf',
+                'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'doc': 'application/msword',
+                'txt': 'text/plain',
+            };
+            const contentType = contentTypeMap[ext || ''] || 'application/octet-stream';
+            const fileName = resource.titleEn.replace(/[^a-zA-Z0-9]/g, '_') +
+                (resource.fileType === 'PDF' ? '.pdf' : resource.fileType === 'DOCX' ? '.docx' : `.${ext}`);
+
+            return new NextResponse(fileBuffer, {
+                headers: {
+                    'Content-Type': contentType,
+                    'Content-Disposition': `attachment; filename="${fileName}"`,
+                },
+            });
+        } catch (fileError) {
+            console.error('File read error:', fileError);
+            return NextResponse.json({ error: 'File not found on server' }, { status: 404 });
+        }
 
     } catch (error) {
         console.error('Download error:', error);

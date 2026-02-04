@@ -180,7 +180,7 @@ export async function GET(request: NextRequest) {
                     "position_uz" TEXT NOT NULL,
                     "position_en" TEXT NOT NULL,
                     "bio_uz" TEXT DEFAULT '',
-                    "bio_en" DEFAULT '',
+                    "bio_en" TEXT DEFAULT '',
                     "photo_url" TEXT DEFAULT '',
                     "status" TEXT NOT NULL DEFAULT 'VISIBLE',
                     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
