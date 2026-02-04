@@ -277,7 +277,7 @@ export default function ResourcesPage() {
                             </div>
 
                             {/* Preview Content */}
-                            <div className="flex-1 bg-gray-900">
+                            <div className="flex-1 bg-gray-900 relative">
                                 {previewResource.fileType === 'PDF' ? (
                                     <iframe
                                         src={`/api/resources/${previewResource.id}/preview`}
@@ -285,12 +285,30 @@ export default function ResourcesPage() {
                                         title={getLocalizedContent(previewResource, 'title', lang)}
                                     />
                                 ) : (
-                                    // Use Google Docs Viewer for DOCX
-                                    <iframe
-                                        src={`https://docs.google.com/viewer?url=${encodeURIComponent(previewResource.fileUrl)}&embedded=true`}
-                                        className="w-full h-full"
-                                        title={getLocalizedContent(previewResource, 'title', lang)}
-                                    />
+                                    // Use Google Docs gview for DOCX with full public URL
+                                    <div className="w-full h-full flex flex-col">
+                                        <iframe
+                                            src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                                                previewResource.fileUrl.startsWith('http')
+                                                    ? previewResource.fileUrl
+                                                    : `${window.location.origin}/api/resources/${previewResource.id}/preview`
+                                            )}&embedded=true`}
+                                            className="w-full h-full"
+                                            title={getLocalizedContent(previewResource, 'title', lang)}
+                                            onError={() => {
+                                                // Fallback to download if viewer fails
+                                                window.location.href = `/api/resources/${previewResource.id}/download`;
+                                            }}
+                                        />
+                                        <div className="absolute bottom-4 left-4 right-4 text-center">
+                                            <a
+                                                href={`/api/resources/${previewResource.id}/download`}
+                                                className="text-sm text-text-muted hover:text-brand-400 underline"
+                                            >
+                                                {lang === 'uz' ? "Ko'rib bo'lmasa, yuklab oling" : "Can't view? Download instead"}
+                                            </a>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </motion.div>
