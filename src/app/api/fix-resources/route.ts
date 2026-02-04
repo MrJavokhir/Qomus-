@@ -15,34 +15,39 @@ export async function GET(request: NextRequest) {
     try {
         const results: string[] = [];
 
-        // Update resources with local file paths to use external demo files
+        // Working PDF URL (verified 200 OK)
+        const pdfUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
+        // Working DOCX URL (verified 200 OK)
+        const docxUrl = 'https://calibre-ebook.com/downloads/demos/demo.docx';
+
+        // Update resources with local file paths or broken URLs to working demo files
         const pdfUpdated = await prisma.resource.updateMany({
             where: {
-                fileUrl: {
-                    startsWith: '/uploads/',
-                    endsWith: '.pdf'
-                }
+                OR: [
+                    { fileUrl: { startsWith: '/uploads/', endsWith: '.pdf' } },
+                    { fileUrl: { contains: 'africau.edu' } }
+                ]
             },
             data: {
-                fileUrl: 'https://www.africau.edu/images/default/sample.pdf'
+                fileUrl: pdfUrl
             }
         });
 
-        results.push(`✅ Updated ${pdfUpdated.count} PDF resources`);
+        results.push(`✅ Updated ${pdfUpdated.count} PDF resources to ${pdfUrl}`);
 
         const docxUpdated = await prisma.resource.updateMany({
             where: {
-                fileUrl: {
-                    startsWith: '/uploads/',
-                    endsWith: '.docx'
-                }
+                OR: [
+                    { fileUrl: { startsWith: '/uploads/', endsWith: '.docx' } },
+                    { fileUrl: { contains: 'file-examples.com' } }
+                ]
             },
             data: {
-                fileUrl: 'https://file-examples.com/storage/fe1156b63820cb8f97146bd/2017/02/file-sample_100kB.docx'
+                fileUrl: docxUrl
             }
         });
 
-        results.push(`✅ Updated ${docxUpdated.count} DOCX resources`);
+        results.push(`✅ Updated ${docxUpdated.count} DOCX resources to ${docxUrl}`);
 
         // Get updated count
         const totalResources = await prisma.resource.count();
