@@ -152,8 +152,8 @@ export default function AdminRegistrations() {
                         key={status}
                         onClick={() => setStatusFilter(status)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${statusFilter === status
-                                ? 'bg-brand-600 text-white'
-                                : 'bg-white/5 text-text-muted hover:bg-white/10'
+                            ? 'bg-brand-600 text-white'
+                            : 'bg-white/5 text-text-muted hover:bg-white/10'
                             }`}
                     >
                         {status || 'All'}
@@ -206,8 +206,8 @@ export default function AdminRegistrations() {
                                         </td>
                                         <td className="py-4 px-6 text-center">
                                             <span className={`px-2 py-1 rounded-md text-[10px] font-bold ${reg.decisionStatus === 'ACCEPTED' ? 'bg-status-green/20 text-status-green' :
-                                                    reg.decisionStatus === 'DECLINED' ? 'bg-status-red/20 text-status-red' :
-                                                        'bg-status-yellow/20 text-status-yellow'
+                                                reg.decisionStatus === 'DECLINED' ? 'bg-status-red/20 text-status-red' :
+                                                    'bg-status-yellow/20 text-status-yellow'
                                                 }`}>
                                                 {reg.decisionStatus}
                                             </span>
@@ -219,6 +219,7 @@ export default function AdminRegistrations() {
                                                         value={editRating}
                                                         onChange={(e) => setEditRating(e.target.value as any)}
                                                         className="bg-dark-bg border border-white/10 rounded-lg py-1 px-2 text-xs text-text-primary outline-none focus:border-brand-600"
+                                                        aria-label="Rating"
                                                     >
                                                         <option value="GREEN">{t.rating.green}</option>
                                                         <option value="YELLOW">{t.rating.yellow}</option>
@@ -256,6 +257,7 @@ export default function AdminRegistrations() {
                                                     <button
                                                         onClick={() => setEditingId(null)}
                                                         className="w-8 h-8 rounded-lg bg-white/5 text-text-muted flex items-center justify-center hover:bg-white/10 transition-all"
+                                                        aria-label="Cancel"
                                                     >
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -263,50 +265,47 @@ export default function AdminRegistrations() {
                                                     </button>
                                                 </div>
                                             ) : (
+                                                <div className="flex justify-end gap-2">
+                                                    {reg.decisionStatus === 'PENDING' && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => handleDecision(reg.id, 'ACCEPTED')}
+                                                                className="w-8 h-8 rounded-lg bg-status-green/20 text-status-green flex items-center justify-center hover:bg-status-green/30 transition-all"
+                                                                title="Accept"
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDecision(reg.id, 'DECLINED')}
+                                                                className="w-8 h-8 rounded-lg bg-status-red/20 text-status-red flex items-center justify-center hover:bg-status-red/30 transition-all"
+                                                                title="Decline"
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditingId(reg.id);
+                                                            setEditRating(reg.ratingStatus);
+                                                            setEditNotes(reg.notes || '');
+                                                        }}
+                                                        className="w-8 h-8 rounded-lg bg-white/5 text-text-muted flex items-center justify-center hover:bg-brand-600/20 hover:text-brand-400 transition-all"
+                                                        title="Edit Rating"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                        </svg>
                                                     </button>
-                                    </div>
-                                ) : (
-                                <div className="flex justify-end gap-2">
-                                    {reg.decisionStatus === 'PENDING' && (
-                                        <>
-                                            <button
-                                                onClick={() => handleDecision(reg.id, 'ACCEPTED')}
-                                                className="w-8 h-8 rounded-lg bg-status-green/20 text-status-green flex items-center justify-center hover:bg-status-green/30 transition-all"
-                                                title="Accept"
-                                            >
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                                            </button>
-                                            <button
-                                                onClick={() => handleDecision(reg.id, 'DECLINED')}
-                                                className="w-8 h-8 rounded-lg bg-status-red/20 text-status-red flex items-center justify-center hover:bg-status-red/30 transition-all"
-                                                title="Decline"
-                                            >
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                                            </button>
-                                        </>
-                                    )}
-                                    <button
-                                        onClick={() => {
-                                            setEditingId(reg.id);
-                                            setEditRating(reg.ratingStatus);
-                                            setEditNotes(reg.notes || '');
-                                        }}
-                                        className="w-8 h-8 rounded-lg bg-white/5 text-text-muted flex items-center justify-center hover:bg-brand-600/20 hover:text-brand-400 transition-all"
-                                        title="Edit Rating"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                        </svg>
-                                    </button>
-                                </div>
+                                                </div>
                                             )}
-                            </td>
-                        </motion.tr>
+                                        </td>
+                                    </motion.tr>
                                 ))}
-                    </AnimatePresence>
-                </tbody>
-            </table>
-        </div>
+                            </AnimatePresence>
+                        </tbody>
+                    </table>
+                </div>
             </motion.div >
         </div >
     );

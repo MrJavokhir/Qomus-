@@ -15,15 +15,20 @@ interface Stats {
     totalVideos: number;
 }
 
-ratingStatus: string;
-decisionStatus: string;
+interface RecentRegistration {
+    id: string;
+    teamName: string;
+    createdAt: string;
+    event: { titleEn: string; titleUz: string };
+    leader: { username: string };
+    ratingStatus: string;
+    decisionStatus: string;
 }
 
 interface PendingRegistration extends RecentRegistration { }
 
 export default function AdminDashboard() {
     const { lang, t } = useI18n();
-    const [stats, setStats] = useState<Stats | null>(null);
     const [stats, setStats] = useState<Stats | null>(null);
     const [recentRegistrations, setRecentRegistrations] = useState<RecentRegistration[]>([]);
     const [pendingRegistrations, setPendingRegistrations] = useState<PendingRegistration[]>([]);
@@ -65,7 +70,7 @@ export default function AdminDashboard() {
         { label: lang === 'uz' ? 'Jami tadbirlar' : 'Total Events', value: stats?.totalEvents || 0, icon: 'Calendar', color: 'green' },
         { label: t.admin.upcomingEvents, value: stats?.upcomingEvents || 0, icon: 'Clock', color: 'yellow' },
         { label: t.admin.totalRegistrations, value: stats?.totalRegistrations || 0, icon: 'Check', color: 'brand' },
-        { label: 'Pending Approvals', value: stats?.pendingRegistrations || 0, icon: 'AlertCircle', color: 'orange' },
+        { label: 'Pending Approvals', value: stats?.pendingRegistrations || 0, icon: 'Clock', color: 'orange' },
         { label: lang === 'uz' ? 'Resurslar' : 'Resources', value: stats?.totalResources || 0, icon: 'Book', color: 'yellow' },
         { label: lang === 'uz' ? 'Videolar' : 'Videos', value: stats?.totalVideos || 0, icon: 'Video', color: 'red' },
     ];
@@ -117,7 +122,7 @@ export default function AdminDashboard() {
                                 >
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="w-10 h-10 rounded-full bg-status-yellow/20 text-status-yellow flex items-center justify-center">
-                                            <Icon name="AlertCircle" />
+                                            <Icon name="Clock" />
                                         </div>
                                         <span className="text-xs font-bold text-status-yellow bg-status-yellow/10 px-2 py-1 rounded">PENDING</span>
                                     </div>
