@@ -49,6 +49,24 @@ export async function GET(request: NextRequest) {
 
         results.push(`✅ Updated ${docxUpdated.count} DOCX resources to ${docxUrl}`);
 
+        // Update Team Members with local photo URLs to use a placeholder
+        // Using a professional looking placeholder or the UI Avatars service if needed, 
+        // but let's use a nice stock photo for the coordinator for now
+        const photoUrl = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80';
+
+        const teamUpdated = await prisma.teamMember.updateMany({
+            where: {
+                photoUrl: {
+                    startsWith: '/uploads/'
+                }
+            },
+            data: {
+                photoUrl: photoUrl
+            }
+        });
+
+        results.push(`✅ Updated ${teamUpdated.count} Team Members photos`);
+
         // Get updated count
         const totalResources = await prisma.resource.count();
         results.push(`📊 Total resources in database: ${totalResources}`);

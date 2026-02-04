@@ -11,6 +11,16 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const status = searchParams.get('status');
 
+        // Lazy update: Set status to PAST for any UPCOMING events that have already started
+        const now = new Date();
+        await prisma.event.updateMany({
+            where: {
+                status: 'UPCOMING',
+                startsAt: { lt: now }
+            },
+            data: { status: 'PAST' }
+        });
+
         const where = status ? { status: status as 'UPCOMING' | 'PAST' } : {};
 
         const events = await prisma.event.findMany({

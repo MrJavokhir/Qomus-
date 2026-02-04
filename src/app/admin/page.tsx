@@ -10,23 +10,23 @@ interface Stats {
     totalEvents: number;
     upcomingEvents: number;
     totalRegistrations: number;
+    pendingRegistrations: number;
     totalResources: number;
     totalVideos: number;
 }
 
-interface RecentRegistration {
-    id: string;
-    teamName: string;
-    createdAt: string;
-    event: { titleEn: string; titleUz: string };
-    leader: { username: string };
-    ratingStatus: string;
+ratingStatus: string;
+decisionStatus: string;
 }
+
+interface PendingRegistration extends RecentRegistration { }
 
 export default function AdminDashboard() {
     const { lang, t } = useI18n();
     const [stats, setStats] = useState<Stats | null>(null);
+    const [stats, setStats] = useState<Stats | null>(null);
     const [recentRegistrations, setRecentRegistrations] = useState<RecentRegistration[]>([]);
+    const [pendingRegistrations, setPendingRegistrations] = useState<PendingRegistration[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -37,12 +37,13 @@ export default function AdminDashboard() {
                     const data = await res.json();
                     setStats(data.stats);
                     setRecentRegistrations(data.recentRegistrations);
+                    setPendingRegistrations(data.pendingRegistrations || []);
                 }
             } catch (err) {
                 console.error(err);
             } finally {
                 setLoading(false);
-            }
+            };
         };
         fetchData();
     }, []);
@@ -64,6 +65,7 @@ export default function AdminDashboard() {
         { label: lang === 'uz' ? 'Jami tadbirlar' : 'Total Events', value: stats?.totalEvents || 0, icon: 'Calendar', color: 'green' },
         { label: t.admin.upcomingEvents, value: stats?.upcomingEvents || 0, icon: 'Clock', color: 'yellow' },
         { label: t.admin.totalRegistrations, value: stats?.totalRegistrations || 0, icon: 'Check', color: 'brand' },
+        { label: 'Pending Approvals', value: stats?.pendingRegistrations || 0, icon: 'AlertCircle', color: 'orange' },
         { label: lang === 'uz' ? 'Resurslar' : 'Resources', value: stats?.totalResources || 0, icon: 'Book', color: 'yellow' },
         { label: lang === 'uz' ? 'Videolar' : 'Videos', value: stats?.totalVideos || 0, icon: 'Video', color: 'red' },
     ];
@@ -86,9 +88,9 @@ export default function AdminDashboard() {
                                 <p className="text-3xl font-extrabold text-text-primary">{kpi.value.toLocaleString()}</p>
                             </div>
                             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${kpi.color === 'brand' ? 'bg-brand-600/10 text-brand-400' :
-                                    kpi.color === 'green' ? 'bg-status-green/10 text-status-green' :
-                                        kpi.color === 'yellow' ? 'bg-status-yellow/10 text-status-yellow' :
-                                            'bg-status-red/10 text-status-red'
+                                kpi.color === 'green' ? 'bg-status-green/10 text-status-green' :
+                                    kpi.color === 'yellow' ? 'bg-status-yellow/10 text-status-yellow' :
+                                        'bg-status-red/10 text-status-red'
                                 } group-hover:scale-110 transition-transform duration-300`}>
                                 <Icon name={kpi.icon as any} />
                             </div>
@@ -96,6 +98,42 @@ export default function AdminDashboard() {
                     </motion.div>
                 ))}
             </div>
+
+            {/* Pending Approvals Widget */}
+            {pendingRegistrations.length > 0 && (
+                <section>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="heading-2 text-text-primary">Action Required</h2>
+                        <Link href="/admin/registrations?decisionStatus=PENDING" className="text-sm text-brand-400 hover:text-brand-300">
+                            View all
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {pendingRegistrations.map((reg) => (
+                            <Link key={reg.id} href={`/admin/registrations?decisionStatus=PENDING`} className="block">
+                                <motion.div
+                                    whileHover={{ y: -5 }}
+                                    className="card p-6 border-status-yellow/30 bg-status-yellow/5 hover:border-status-yellow/50 transition-all"
+                                >
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="w-10 h-10 rounded-full bg-status-yellow/20 text-status-yellow flex items-center justify-center">
+                                            <Icon name="AlertCircle" />
+                                        </div>
+                                        <span className="text-xs font-bold text-status-yellow bg-status-yellow/10 px-2 py-1 rounded">PENDING</span>
+                                    </div>
+                                    <h3 className="font-bold text-lg text-text-primary mb-1">{reg.teamName}</h3>
+                                    <p className="text-sm text-text-secondary mb-4 line-clamp-1">{getLocalizedContent(reg.event, 'title', lang)}</p>
+                                    <div className="flex items-center gap-2 text-xs text-text-muted">
+                                        <span>{reg.leader.username}</span>
+                                        <span>•</span>
+                                        <span>{new Date(reg.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                </motion.div>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* Recent Activity */}
             <div className="grid lg:grid-cols-3 gap-8">

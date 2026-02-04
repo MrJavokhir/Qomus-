@@ -11,6 +11,7 @@ interface Registration {
     membersCount: number;
     ratingStatus: 'GREEN' | 'YELLOW' | 'RED';
     notes: string | null;
+    decisionStatus: 'PENDING' | 'ACCEPTED' | 'DECLINED';
     createdAt: string;
     event: {
         id: string;
@@ -33,23 +34,29 @@ export default function AdminRegistrations() {
     const [editRating, setEditRating] = useState<'GREEN' | 'YELLOW' | 'RED'>('YELLOW');
     const [editNotes, setEditNotes] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [statusFilter, setStatusFilter] = useState('');
+
+    const fetchRegistrations = async () => {
+        setLoading(true);
+        try {
+            const params = new URLSearchParams();
+            if (statusFilter) params.append('decisionStatus', statusFilter);
+
+            const res = await fetch(`/api/registrations?${params.toString()}`);
+            if (res.ok) {
+                const data = await res.json();
+                setRegistrations(data.registrations || []);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchRegistrations = async () => {
-            try {
-                const res = await fetch('/api/registrations');
-                if (res.ok) {
-                    const data = await res.json();
-                    setRegistrations(data.registrations || []);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchRegistrations();
-    }, []);
+    }, [statusFilter]);
 
     const handleUpdateRating = async (id: string) => {
         setSubmitting(true);
@@ -75,6 +82,31 @@ export default function AdminRegistrations() {
             console.error('Error updating rating:', error);
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleDecision = async (id: string, status: 'ACCEPTED' | 'DECLINED') => {
+        if (!confirm(status === 'ACCEPTED' ? 'Accept this team?' : 'Decline this team?')) return;
+
+        try {
+            const res = await fetch(`/api/registrations/${id}/decision`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ decisionStatus: status }),
+            });
+
+            if (res.ok) {
+                showToast(status === 'ACCEPTED' ? 'Team accepted' : 'Team declined');
+                const data = await res.json();
+                setRegistrations(registrations.map((r) =>
+                    r.id === id ? { ...r, decisionStatus: status } : r
+                ));
+            } else {
+                showToast('Error updating status', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Error', 'error');
         }
     };
 
@@ -113,6 +145,22 @@ export default function AdminRegistrations() {
                 </a>
             </motion.div>
 
+            {/* Filter */}
+            <div className="flex gap-2">
+                {['', 'PENDING', 'ACCEPTED', 'DECLINED'].map((status) => (
+                    <button
+                        key={status}
+                        onClick={() => setStatusFilter(status)}
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${statusFilter === status
+                                ? 'bg-brand-600 text-white'
+                                : 'bg-white/5 text-text-muted hover:bg-white/10'
+                            }`}
+                    >
+                        {status || 'All'}
+                    </button>
+                ))}
+            </div>
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -126,6 +174,7 @@ export default function AdminRegistrations() {
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Tadbir' : 'Event'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Soni' : 'Count'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Sardor' : 'Leader'}</th>
+                                <th className="py-4 px-6 text-center">Status</th>
                                 <th className="py-4 px-6">{t.admin.rating}</th>
                                 <th className="py-4 px-6 text-right">{t.admin.edit}</th>
                             </tr>
@@ -154,6 +203,14 @@ export default function AdminRegistrations() {
                                                 </div>
                                                 <span className="text-sm text-text-secondary">{reg.leader.username}</span>
                                             </div>
+                                        </td>
+                                        <td className="py-4 px-6 text-center">
+                                            <span className={`px-2 py-1 rounded-md text-[10px] font-bold ${reg.decisionStatus === 'ACCEPTED' ? 'bg-status-green/20 text-status-green' :
+                                                    reg.decisionStatus === 'DECLINED' ? 'bg-status-red/20 text-status-red' :
+                                                        'bg-status-yellow/20 text-status-yellow'
+                                                }`}>
+                                                {reg.decisionStatus}
+                                            </span>
                                         </td>
                                         <td className="py-4 px-6">
                                             {editingId === reg.id ? (
@@ -206,27 +263,51 @@ export default function AdminRegistrations() {
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <button
-                                                    onClick={() => {
-                                                        setEditingId(reg.id);
-                                                        setEditRating(reg.ratingStatus);
-                                                        setEditNotes(reg.notes || '');
-                                                    }}
-                                                    className="w-8 h-8 rounded-lg bg-white/5 text-text-muted flex items-center justify-center hover:bg-brand-600/20 hover:text-brand-400 transition-all ml-auto"
-                                                >
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                    </svg>
-                                                </button>
+                                                    </button>
+                                    </div>
+                                ) : (
+                                <div className="flex justify-end gap-2">
+                                    {reg.decisionStatus === 'PENDING' && (
+                                        <>
+                                            <button
+                                                onClick={() => handleDecision(reg.id, 'ACCEPTED')}
+                                                className="w-8 h-8 rounded-lg bg-status-green/20 text-status-green flex items-center justify-center hover:bg-status-green/30 transition-all"
+                                                title="Accept"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                            </button>
+                                            <button
+                                                onClick={() => handleDecision(reg.id, 'DECLINED')}
+                                                className="w-8 h-8 rounded-lg bg-status-red/20 text-status-red flex items-center justify-center hover:bg-status-red/30 transition-all"
+                                                title="Decline"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                            </button>
+                                        </>
+                                    )}
+                                    <button
+                                        onClick={() => {
+                                            setEditingId(reg.id);
+                                            setEditRating(reg.ratingStatus);
+                                            setEditNotes(reg.notes || '');
+                                        }}
+                                        className="w-8 h-8 rounded-lg bg-white/5 text-text-muted flex items-center justify-center hover:bg-brand-600/20 hover:text-brand-400 transition-all"
+                                        title="Edit Rating"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
+                                    </button>
+                                </div>
                                             )}
-                                        </td>
-                                    </motion.tr>
+                            </td>
+                        </motion.tr>
                                 ))}
-                            </AnimatePresence>
-                        </tbody>
-                    </table>
-                </div>
-            </motion.div>
+                    </AnimatePresence>
+                </tbody>
+            </table>
         </div>
+            </motion.div >
+        </div >
     );
 }

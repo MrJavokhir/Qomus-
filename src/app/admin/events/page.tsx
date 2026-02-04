@@ -26,6 +26,8 @@ interface Event {
     coverImageUrl: string | null;
     status: 'UPCOMING' | 'PAST';
     createdAt: string;
+    createdById: string;
+    registrationDeadlineAt: string | null;
     gallery: EventImage[];
 }
 
@@ -71,6 +73,7 @@ export default function AdminEvents() {
             locationUz: '',
             locationEn: '',
             status: 'UPCOMING',
+            registrationDeadlineAt: null,
             gallery: [],
         });
         setActiveTab('info');
@@ -81,6 +84,7 @@ export default function AdminEvents() {
         setEditingEvent({
             ...event,
             date: event.date ? new Date(event.date).toISOString().split('T')[0] : '',
+            registrationDeadlineAt: event.registrationDeadlineAt,
         });
         setActiveTab('info');
         setIsFormOpen(true);
