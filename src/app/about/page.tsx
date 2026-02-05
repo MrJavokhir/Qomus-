@@ -195,12 +195,20 @@ export default function AboutPage() {
                                                     src={member.photoUrl}
                                                     alt={member.fullName}
                                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.style.display = 'none';
+                                                        if (target.nextElementSibling) {
+                                                            (target.nextElementSibling as HTMLElement).style.display = 'flex';
+                                                        }
+                                                    }}
                                                 />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-brand-600/30">
-                                                    {member.fullName[0]}
-                                                </div>
-                                            )}
+                                            ) : null}
+                                            <div
+                                                className={`w-full h-full items-center justify-center text-4xl font-bold text-brand-600/30 ${member.photoUrl ? 'hidden' : 'flex'}`}
+                                            >
+                                                {member.fullName[0]}
+                                            </div>
                                             {/* Social Overlay */}
                                             <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex justify-center gap-4">
                                                 {member.telegramUrl && (
