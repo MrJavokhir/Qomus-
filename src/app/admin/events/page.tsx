@@ -382,7 +382,7 @@ export default function AdminEvents() {
                                 <label className="text-xs font-bold text-text-muted uppercase tracking-wider">{lang === 'uz' ? 'Holat' : 'Status'}</label>
                                 <select
                                     value={editingEvent?.status || 'UPCOMING'}
-                                    onChange={(e) => setEditingEvent({ ...editingEvent, status: e.target.value })}
+                                    onChange={(e) => setEditingEvent({ ...editingEvent!, status: e.target.value as 'UPCOMING' | 'PAST' })}
                                     className="input w-full"
                                 >
                                     <option value="UPCOMING">{lang === 'uz' ? 'Kutilmoqda' : 'Upcoming'}</option>
