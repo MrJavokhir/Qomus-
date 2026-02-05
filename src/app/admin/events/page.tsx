@@ -377,6 +377,19 @@ export default function AdminEvents() {
                                 </div>
                             </div>
 
+                            {/* Status */}
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-text-muted uppercase tracking-wider">{lang === 'uz' ? 'Holat' : 'Status'}</label>
+                                <select
+                                    value={editingEvent?.status || 'UPCOMING'}
+                                    onChange={(e) => setEditingEvent({ ...editingEvent, status: e.target.value })}
+                                    className="input w-full"
+                                >
+                                    <option value="UPCOMING">{lang === 'uz' ? 'Kutilmoqda' : 'Upcoming'}</option>
+                                    <option value="PAST">{lang === 'uz' ? 'O\'tib ketgan' : 'Past'}</option>
+                                </select>
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-text-muted uppercase tracking-wider">{lang === 'uz' ? 'Manzil (UZ)' : 'Location (UZ)'}</label>

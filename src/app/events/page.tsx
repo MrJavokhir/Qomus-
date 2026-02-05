@@ -46,16 +46,21 @@ export default function EventsPage() {
         fetchEvents();
     }, []);
 
-    const filteredEvents = events.filter((event) => {
-        if (filter === 'ALL') return true;
-        return event.status === filter;
-    });
+    const upcomingEvents = events
+        .filter(e => e.status === 'UPCOMING')
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    const tabs = [
-        { key: 'ALL', label: t.common.all },
-        { key: 'UPCOMING', label: t.events.upcoming },
-        { key: 'PAST', label: t.events.past },
-    ];
+    const pastEvents = events
+        .filter(e => e.status === 'PAST')
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    const EventGrid = ({ items }: { items: Event[] }) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map((event, i) => (
+                <EventCard key={event.id} event={event} index={i} />
+            ))}
+        </div>
+    );
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -67,7 +72,7 @@ export default function EventsPage() {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-center mb-12"
+                        className="text-center mb-16"
                     >
                         <h1 className="heading-1 text-text-primary mb-4">
                             {t.events.title}
@@ -79,37 +84,6 @@ export default function EventsPage() {
                         </p>
                     </motion.div>
 
-                    {/* Filter Tabs */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="flex justify-center mb-10"
-                    >
-                        <div className="inline-flex bg-white/5 rounded-xl p-1 border border-white/10">
-                            {tabs.map((tab) => (
-                                <button
-                                    key={tab.key}
-                                    onClick={() => setFilter(tab.key as 'ALL' | 'UPCOMING' | 'PAST')}
-                                    className={`relative px-6 py-2.5 text-sm font-medium rounded-lg transition-all ${filter === tab.key
-                                        ? 'text-text-primary'
-                                        : 'text-text-muted hover:text-text-secondary'
-                                        }`}
-                                >
-                                    {filter === tab.key && (
-                                        <motion.div
-                                            layoutId="tab-indicator"
-                                            className="absolute inset-0 bg-brand-600 rounded-lg"
-                                            transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
-                                        />
-                                    )}
-                                    <span className="relative z-10">{tab.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </motion.div>
-
-                    {/* Events Grid */}
                     {loading ? (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -125,34 +99,34 @@ export default function EventsPage() {
                                 </div>
                             ))}
                         </div>
-                    ) : filteredEvents.length > 0 ? (
-                        <motion.div
-                            initial="hidden"
-                            animate="visible"
-                            variants={{
-                                visible: {
-                                    transition: { staggerChildren: 0.1 },
-                                },
-                            }}
-                            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-                        >
-                            {filteredEvents.map((event, i) => (
-                                <EventCard key={event.id} event={event} index={i} />
-                            ))}
-                        </motion.div>
                     ) : (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="text-center py-16"
-                        >
-                            <div className="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-10 h-10 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <p className="text-text-muted text-lg">{t.events.noEvents}</p>
-                        </motion.div>
+                        <div className="space-y-20">
+                            {/* Upcoming Events */}
+                            <section>
+                                <div className="flex items-center gap-4 mb-8">
+                                    <h2 className="heading-2 text-text-primary">{t.events.upcoming}</h2>
+                                    <div className="h-px flex-1 bg-white/10" />
+                                </div>
+                                {upcomingEvents.length > 0 ? (
+                                    <EventGrid items={upcomingEvents} />
+                                ) : (
+                                    <p className="text-text-muted italic">{lang === 'uz' ? 'Hozircha kutilayotgan tadbirlar yo\'q' : 'No upcoming events'}</p>
+                                )}
+                            </section>
+
+                            {/* Past Events */}
+                            <section>
+                                <div className="flex items-center gap-4 mb-8">
+                                    <h2 className="heading-2 text-text-primary opacity-80">{t.events.past}</h2>
+                                    <div className="h-px flex-1 bg-white/10" />
+                                </div>
+                                {pastEvents.length > 0 ? (
+                                    <EventGrid items={pastEvents} />
+                                ) : (
+                                    <p className="text-text-muted italic">{lang === 'uz' ? 'O\'tib ketgan tadbirlar yo\'q' : 'No past events'}</p>
+                                )}
+                            </section>
+                        </div>
                     )}
                 </div>
             </main>
