@@ -96,8 +96,22 @@ export default function VideosPage() {
                                     onClick={() => setSelectedVideo(video)}
                                 >
                                     <div className="relative aspect-video bg-dark-surface overflow-hidden">
-                                        {/* Video Thumbnail Placeholder/Icon */}
-                                        <div className="absolute inset-0 flex items-center justify-center">
+                                        <video
+                                            src={video.videoUrl}
+                                            className="w-full h-full object-cover"
+                                            muted
+                                            playsInline
+                                            preload="metadata"
+                                            poster={video.thumbnailUrl || undefined}
+                                            onLoadedMetadata={(e) => {
+                                                if (!video.thumbnailUrl) {
+                                                    e.currentTarget.currentTime = 1;
+                                                }
+                                            }}
+                                        />
+
+                                        {/* Fallback Icon (behind video if fails to load, or while loading) */}
+                                        <div className="absolute inset-0 flex items-center justify-center -z-10">
                                             <svg className="w-16 h-16 text-white/10" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
                                             </svg>
