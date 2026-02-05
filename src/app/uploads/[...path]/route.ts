@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
-import { lookup } from 'mime-types'; // need to check if mime-types is installed, or valid helper
 
 // Fallback mime type helper if package not available
 const getMimeType = (filename: string) => {
