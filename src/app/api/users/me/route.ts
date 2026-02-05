@@ -6,20 +6,27 @@ import bcrypt from 'bcryptjs';
 // GET /api/users/me - Get current user profile
 export async function GET() {
     try {
-        const user = await getCurrentUser();
-        if (!user) {
+        const session = await getCurrentUser();
+        if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        return NextResponse.json({
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                photoUrl: user.photoUrl,
-                role: user.role,
+        const user = await prisma.user.findUnique({
+            where: { id: session.userId },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                photoUrl: true,
+                role: true,
             }
         });
+
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        return NextResponse.json({ user });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Internal error' }, { status: 500 });
@@ -29,9 +36,17 @@ export async function GET() {
 // PUT /api/users/me - Update current user profile
 export async function PUT(request: NextRequest) {
     try {
-        const user = await getCurrentUser();
-        if (!user) {
+        const session = await getCurrentUser();
+        if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: session.userId },
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
         const body = await request.json();
