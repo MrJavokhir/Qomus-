@@ -38,6 +38,14 @@
   /* Shadows - Soft & Modern */
   --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   --shadow-card-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+
+  /* Status Colors */
+  --status-success: #10B981;
+  /* Emerald 500 */
+  --status-warning: #F59E0B;
+  /* Amber 500 */
+  --status-error: #EF4444;
+  /* Red 500 */
 }
 
 .dark {
@@ -216,6 +224,47 @@ body::after {
 
   .dark .text-gradient {
     @apply from-brand-400 to-blue-400;
+  }
+
+  /* FORMS & INPUTS */
+  .input {
+    @apply w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-text-primary transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500;
+    @apply placeholder:text-text-muted;
+  }
+
+  .dark .input {
+    @apply bg-slate-800/50 border-white/10 text-white placeholder:text-slate-500;
+    @apply focus:border-brand-400 focus:ring-brand-400/20;
+  }
+
+  /* BADGES */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium tracking-wide;
+  }
+
+  .badge-green {
+    @apply bg-green-50 text-green-700 border border-green-200;
+  }
+
+  .dark .badge-green {
+    @apply bg-green-500/10 text-green-400 border-green-500/20;
+  }
+
+  .badge-yellow {
+    @apply bg-amber-50 text-amber-700 border border-amber-200;
+  }
+
+  .dark .badge-yellow {
+    @apply bg-amber-500/10 text-amber-400 border-amber-500/20;
+  }
+
+  .badge-red {
+    @apply bg-red-50 text-red-700 border border-red-200;
+  }
+
+  .dark .badge-red {
+    @apply bg-red-500/10 text-red-400 border-red-500/20;
   }
 }
 

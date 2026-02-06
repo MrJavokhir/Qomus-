@@ -52,8 +52,11 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
 
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
-                                <span className={`badge ${event.status === 'UPCOMING' ? 'badge-green' : 'badge-yellow'}`}>
-                                    {event.status === 'UPCOMING' ? t.events.upcoming : t.events.past}
+                                <span className={`badge ${event.status === 'UPCOMING' ? 'badge-green' :
+                                        event.status === 'REJECTED' ? 'badge-red' : 'badge-yellow'
+                                    }`}>
+                                    {event.status === 'UPCOMING' ? t.events.upcoming :
+                                        event.status === 'REJECTED' ? 'Rejected' : t.events.past}
                                 </span>
                                 <span className="text-xs text-text-muted">{year}</span>
                             </div>

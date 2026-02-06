@@ -127,12 +127,12 @@ export default function AdminSettings() {
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Photo Section */}
-                <div className="card p-6 border-white/10">
+                <div className="card p-6">
                     <h2 className="font-semibold text-text-primary mb-4">
                         {lang === 'uz' ? 'Profil rasmi' : 'Profile Photo'}
                     </h2>
                     <div className="flex items-center gap-6">
-                        <div className="w-24 h-24 rounded-full bg-white/10 overflow-hidden flex-shrink-0 border-2 border-white/10">
+                        <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-white/5 overflow-hidden flex-shrink-0 border-2 border-white dark:border-white/10 shadow-lg">
                             {photoUrl ? (
                                 <img src={photoUrl} alt="" className="w-full h-full object-cover" />
                             ) : (
@@ -163,7 +163,7 @@ export default function AdminSettings() {
                 </div>
 
                 {/* Account Info Section */}
-                <div className="card p-6 border-white/10">
+                <div className="card p-6">
                     <h2 className="font-semibold text-text-primary mb-4">
                         {lang === 'uz' ? 'Hisob ma\'lumotlari' : 'Account Information'}
                     </h2>
@@ -177,7 +177,7 @@ export default function AdminSettings() {
                                 required
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="input w-full"
+                                className="input"
                             />
                         </div>
                         <div className="space-y-1.5">
@@ -188,7 +188,7 @@ export default function AdminSettings() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="input w-full"
+                                className="input"
                                 placeholder="example@email.com"
                             />
                         </div>
@@ -196,7 +196,7 @@ export default function AdminSettings() {
                 </div>
 
                 {/* Password Section */}
-                <div className="card p-6 border-white/10">
+                <div className="card p-6">
                     <h2 className="font-semibold text-text-primary mb-4">
                         {lang === 'uz' ? 'Parolni o\'zgartirish' : 'Change Password'}
                     </h2>
@@ -209,7 +209,7 @@ export default function AdminSettings() {
                                 type="password"
                                 value={currentPassword}
                                 onChange={(e) => setCurrentPassword(e.target.value)}
-                                className="input w-full"
+                                className="input"
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -221,7 +221,7 @@ export default function AdminSettings() {
                                     type="password"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="input w-full"
+                                    className="input"
                                 />
                             </div>
                             <div className="space-y-1.5">
@@ -232,7 +232,7 @@ export default function AdminSettings() {
                                     type="password"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="input w-full"
+                                    className="input"
                                 />
                             </div>
                         </div>
