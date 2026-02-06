@@ -81,7 +81,16 @@ export async function POST(request: NextRequest) {
                 registrationDeadlineAt: body.registrationDeadlineAt ? new Date(body.registrationDeadlineAt) : null,
                 status: startsAt >= now ? 'UPCOMING' : 'PAST',
                 createdById: user!.userId,
+                gallery: body.gallery && body.gallery.length > 0 ? {
+                    create: body.gallery.map((img: { imageUrl: string; order: number }, idx: number) => ({
+                        imageUrl: img.imageUrl,
+                        order: img.order ?? idx
+                    }))
+                } : undefined,
             },
+            include: {
+                gallery: true
+            }
         });
 
         return NextResponse.json({ event }, { status: 201 });

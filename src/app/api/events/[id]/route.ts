@@ -73,6 +73,13 @@ export async function PUT(
         const startsAt = parseTashkentTime(validatedData.date, validatedData.time).toDate();
         const now = nowInTashkent().toDate();
 
+        // Handle gallery update: delete old images and create new ones
+        if (body.gallery !== undefined) {
+            await prisma.eventImage.deleteMany({
+                where: { eventId: id }
+            });
+        }
+
         const event = await prisma.event.update({
             where: { id },
             data: {
@@ -88,7 +95,16 @@ export async function PUT(
                 coverImageUrl: body.coverImageUrl !== undefined ? body.coverImageUrl : undefined,
                 registrationDeadlineAt: body.registrationDeadlineAt ? new Date(body.registrationDeadlineAt) : null,
                 status: startsAt >= now ? 'UPCOMING' : 'PAST',
+                gallery: body.gallery && body.gallery.length > 0 ? {
+                    create: body.gallery.map((img: { imageUrl: string; order: number }, idx: number) => ({
+                        imageUrl: img.imageUrl,
+                        order: img.order ?? idx
+                    }))
+                } : undefined,
             },
+            include: {
+                gallery: true
+            }
         });
 
         return NextResponse.json({ event });

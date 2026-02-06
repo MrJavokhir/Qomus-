@@ -329,8 +329,36 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                                 <div className="card p-6 border-white/10 bg-dark-surface/50">
                                     <p className="text-sm text-text-muted mb-4">{lang === 'uz' ? 'Do\'stlar bilan ulashing:' : 'Share with friends:'}</p>
                                     <div className="flex gap-3">
-                                        <button className="flex-1 btn btn-secondary py-2 text-xs">Telegram</button>
-                                        <button className="flex-1 btn btn-secondary py-2 text-xs">Copy Link</button>
+                                        <button
+                                            onClick={() => {
+                                                const url = window.location.href;
+                                                const text = encodeURIComponent(`${title}\n${formattedDate}\n${location}`);
+                                                window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${text}`, '_blank');
+                                            }}
+                                            className="flex-1 btn btn-secondary py-2 text-xs"
+                                        >
+                                            Telegram
+                                        </button>
+                                        <button
+                                            onClick={async () => {
+                                                try {
+                                                    await navigator.clipboard.writeText(window.location.href);
+                                                    alert(lang === 'uz' ? 'Havola nusxalandi!' : 'Link copied!');
+                                                } catch {
+                                                    // Fallback for older browsers
+                                                    const textArea = document.createElement('textarea');
+                                                    textArea.value = window.location.href;
+                                                    document.body.appendChild(textArea);
+                                                    textArea.select();
+                                                    document.execCommand('copy');
+                                                    document.body.removeChild(textArea);
+                                                    alert(lang === 'uz' ? 'Havola nusxalandi!' : 'Link copied!');
+                                                }
+                                            }}
+                                            className="flex-1 btn btn-secondary py-2 text-xs"
+                                        >
+                                            {lang === 'uz' ? 'Havolani nusxalash' : 'Copy Link'}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
