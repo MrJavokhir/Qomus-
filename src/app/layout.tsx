@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/i18n";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import PageTransition from "@/components/PageTransition";
+import AppShell from "@/components/AppShell";
 
 const inter = Inter({
     subsets: ["latin", "cyrillic"],
@@ -31,9 +31,9 @@ export default function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
-                        <PageTransition>
+                        <AppShell>
                             {children}
-                        </PageTransition>
+                        </AppShell>
                     </ThemeProvider>
                 </I18nProvider>
             </body>

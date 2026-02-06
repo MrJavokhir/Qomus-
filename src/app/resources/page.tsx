@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { useI18n, getLocalizedContent } from '@/i18n';
 
 interface Resource {
@@ -53,10 +51,8 @@ export default function ResourcesPage() {
     });
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <Navbar />
-
-            <main className="flex-1 pt-24 pb-16">
+        <>
+            <div className="flex-1 pt-24 pb-16">
                 <div className="container-main">
                     {/* Header */}
                     <motion.div
@@ -210,9 +206,7 @@ export default function ResourcesPage() {
                         </div>
                     )}
                 </div>
-            </main>
-
-            <Footer />
+            </div>
 
             {/* Preview Modal */}
             <AnimatePresence>
@@ -315,6 +309,6 @@ export default function ResourcesPage() {
                     </div>
                 )}
             </AnimatePresence>
-        </div>
+        </>
     );
 }

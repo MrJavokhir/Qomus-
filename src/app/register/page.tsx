@@ -2,8 +2,6 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { useI18n } from '@/i18n';
 
 export default function RegisterPage() {
@@ -65,67 +63,61 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <Navbar />
+        <div className="flex-1 pt-32 pb-20">
+            <div className="container-main">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center max-w-3xl mx-auto mb-16"
+                >
+                    <h1 className="heading-1 text-text-primary mb-4">
+                        {c.title}
+                    </h1>
+                    <p className="text-xl text-text-secondary">{c.subtitle}</p>
+                </motion.div>
 
-            <main className="flex-1 pt-32 pb-20">
-                <div className="container-main">
+                <div className="max-w-4xl mx-auto">
+                    <div className="grid md:grid-cols-2 gap-6 mb-16">
+                        {steps.map((step, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1 }}
+                                className="card p-8 border-white/10 glass card-hover flex gap-6"
+                            >
+                                <div className={`w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center ${step.color === 'brand' ? 'bg-brand-600/20 text-brand-400' :
+                                    step.color === 'green' ? 'bg-status-green/20 text-status-green' :
+                                        'bg-status-yellow/20 text-status-yellow'
+                                    }`}>
+                                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        {getIcon(step.icon)}
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 className="heading-3 text-text-primary mb-2">{step.title}</h3>
+                                    <p className="text-text-secondary text-sm leading-relaxed">{step.text}</p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-center max-w-3xl mx-auto mb-16"
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="flex flex-col sm:flex-row gap-4 justify-center items-center"
                     >
-                        <h1 className="heading-1 text-text-primary mb-4">
-                            {c.title}
-                        </h1>
-                        <p className="text-xl text-text-secondary">{c.subtitle}</p>
+                        <Link href="/signup" className="btn btn-primary text-lg px-12 py-4 shadow-glow">
+                            {c.createAccount}
+                        </Link>
+                        <Link href="/events" className="btn btn-secondary text-lg px-12 py-4">
+                            {t.nav.events}
+                        </Link>
                     </motion.div>
-
-                    <div className="max-w-4xl mx-auto">
-                        <div className="grid md:grid-cols-2 gap-6 mb-16">
-                            {steps.map((step, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.1 }}
-                                    className="card p-8 border-white/10 glass card-hover flex gap-6"
-                                >
-                                    <div className={`w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center ${step.color === 'brand' ? 'bg-brand-600/20 text-brand-400' :
-                                            step.color === 'green' ? 'bg-status-green/20 text-status-green' :
-                                                'bg-status-yellow/20 text-status-yellow'
-                                        }`}>
-                                        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            {getIcon(step.icon)}
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 className="heading-3 text-text-primary mb-2">{step.title}</h3>
-                                        <p className="text-text-secondary text-sm leading-relaxed">{step.text}</p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-                        >
-                            <Link href="/signup" className="btn btn-primary text-lg px-12 py-4 shadow-glow">
-                                {c.createAccount}
-                            </Link>
-                            <Link href="/events" className="btn btn-secondary text-lg px-12 py-4">
-                                {t.nav.events}
-                            </Link>
-                        </motion.div>
-                    </div>
                 </div>
-            </main>
-
-            <Footer />
+            </div>
         </div>
     );
 }

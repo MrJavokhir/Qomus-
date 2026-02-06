@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import EventCard from '@/components/EventCard';
 import Typewriter from '@/components/Typewriter';
 import { useI18n, getLocalizedContent } from '@/i18n';
@@ -148,8 +146,6 @@ export default function HomePage() {
 
     return (
         <div className="min-h-screen flex flex-col overflow-x-hidden">
-            <Navbar />
-
             {/* HERO SECTION - REDESIGNED */}
             <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
                 {/* Visual Elements - Blobs & Mesh */}
@@ -403,8 +399,6 @@ export default function HomePage() {
                     </div>
                 </div>
             </section>
-
-            <Footer />
         </div>
     );
 }

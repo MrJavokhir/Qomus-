@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { useI18n } from '@/i18n';
 
 export default function ContactPage() {
@@ -54,105 +52,99 @@ export default function ContactPage() {
     ];
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <Navbar />
+        <div className="flex-1 pt-24 pb-16">
+            <div className="container-main">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center max-w-2xl mx-auto mb-16"
+                >
+                    <h1 className="heading-1 text-text-primary mb-4">{t.nav.contact}</h1>
+                    <p className="text-text-secondary">
+                        {lang === 'uz' ? "Savollaringiz bo'lsa, quyidagi forma orqali bizga murojaat qiling." : "If you have any questions, please contact us using the form below."}
+                    </p>
+                </motion.div>
 
-            <main className="flex-1 pt-24 pb-16">
-                <div className="container-main">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-center max-w-2xl mx-auto mb-16"
-                    >
-                        <h1 className="heading-1 text-text-primary mb-4">{t.nav.contact}</h1>
-                        <p className="text-text-secondary">
-                            {lang === 'uz' ? "Savollaringiz bo'lsa, quyidagi forma orqali bizga murojaat qiling." : "If you have any questions, please contact us using the form below."}
-                        </p>
-                    </motion.div>
-
-                    <div className="grid lg:grid-cols-3 gap-12">
-                        {/* Contact Info */}
-                        <div className="lg:col-span-1 space-y-6">
-                            {contactInfo.map((item, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: i * 0.1 }}
-                                    className="card p-6 border-white/5 bg-dark-card/50"
-                                >
-                                    <div className="flex gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-brand-600/20 text-brand-400 flex items-center justify-center flex-shrink-0">
-                                            {item.icon}
-                                        </div>
-                                        <div>
-                                            <p className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-1">
-                                                {item.label}
-                                            </p>
-                                            <p className="text-text-primary font-medium">{item.value}</p>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        {/* Form */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.3 }}
-                            className="lg:col-span-2"
-                        >
-                            <div className="card p-8 md:p-10 border-white/10 glass">
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    <div className="grid md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label className="label">{lang === 'uz' ? 'Ismingiz' : 'Full Name'}</label>
-                                            <input type="text" required className="input" placeholder="Javohir Mutallibov" />
-                                        </div>
-                                        <div>
-                                            <label className="label">Email</label>
-                                            <input type="email" required className="input" placeholder="example@mail.com" />
-                                        </div>
+                <div className="grid lg:grid-cols-3 gap-12">
+                    {/* Contact Info */}
+                    <div className="lg:col-span-1 space-y-6">
+                        {contactInfo.map((item, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: i * 0.1 }}
+                                className="card p-6 border-white/5 bg-dark-card/50"
+                            >
+                                <div className="flex gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-brand-600/20 text-brand-400 flex items-center justify-center flex-shrink-0">
+                                        {item.icon}
                                     </div>
                                     <div>
-                                        <label className="label">{lang === 'uz' ? 'Mavzu' : 'Subject'}</label>
-                                        <input type="text" required className="input" placeholder={lang === 'uz' ? 'Hamkorlik bo\'yicha' : 'Regarding collaboration'} />
+                                        <p className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-1">
+                                            {item.label}
+                                        </p>
+                                        <p className="text-text-primary font-medium">{item.value}</p>
                                     </div>
-                                    <div>
-                                        <label className="label">{lang === 'uz' ? 'Xabar' : 'Message'}</label>
-                                        <textarea required rows={5} className="input resize-none" placeholder={lang === 'uz' ? 'Xabaringizni yozing...' : 'Write your message...'} />
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        disabled={loading || success}
-                                        className="btn btn-primary w-full py-4 text-base"
-                                    >
-                                        {loading ? (
-                                            <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                            </svg>
-                                        ) : success ? (
-                                            <div className="flex items-center gap-2">
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                {lang === 'uz' ? 'Yuborildi!' : 'Sent!'}
-                                            </div>
-                                        ) : (
-                                            lang === 'uz' ? 'Yuborish' : 'Send Message'
-                                        )}
-                                    </button>
-                                </form>
-                            </div>
-                        </motion.div>
+                                </div>
+                            </motion.div>
+                        ))}
                     </div>
-                </div>
-            </main>
 
-            <Footer />
+                    {/* Form */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.3 }}
+                        className="lg:col-span-2"
+                    >
+                        <div className="card p-8 md:p-10 border-white/10 glass">
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="label">{lang === 'uz' ? 'Ismingiz' : 'Full Name'}</label>
+                                        <input type="text" required className="input" placeholder="Javohir Mutallibov" />
+                                    </div>
+                                    <div>
+                                        <label className="label">Email</label>
+                                        <input type="email" required className="input" placeholder="example@mail.com" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="label">{lang === 'uz' ? 'Mavzu' : 'Subject'}</label>
+                                    <input type="text" required className="input" placeholder={lang === 'uz' ? 'Hamkorlik bo\'yicha' : 'Regarding collaboration'} />
+                                </div>
+                                <div>
+                                    <label className="label">{lang === 'uz' ? 'Xabar' : 'Message'}</label>
+                                    <textarea required rows={5} className="input resize-none" placeholder={lang === 'uz' ? 'Xabaringizni yozing...' : 'Write your message...'} />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={loading || success}
+                                    className="btn btn-primary w-full py-4 text-base"
+                                >
+                                    {loading ? (
+                                        <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                        </svg>
+                                    ) : success ? (
+                                        <div className="flex items-center gap-2">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            {lang === 'uz' ? 'Yuborildi!' : 'Sent!'}
+                                        </div>
+                                    ) : (
+                                        lang === 'uz' ? 'Yuborish' : 'Send Message'
+                                    )}
+                                </button>
+                            </form>
+                        </div>
+                    </motion.div>
+                </div>
+            </div>
         </div>
     );
 }

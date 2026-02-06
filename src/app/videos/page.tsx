@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { useI18n, getLocalizedContent } from '@/i18n';
 
 interface Video {
@@ -49,10 +47,8 @@ export default function VideosPage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <Navbar />
-
-            <main className="flex-1 pt-24 pb-16">
+        <>
+            <div className="flex-1 pt-24 pb-16">
                 <div className="container-main">
                     {/* Header */}
                     <motion.div
@@ -156,7 +152,7 @@ export default function VideosPage() {
                         </div>
                     )}
                 </div>
-            </main>
+            </div>
 
             {/* Video Modal */}
             <AnimatePresence>
@@ -259,7 +255,6 @@ export default function VideosPage() {
                 )}
             </AnimatePresence>
 
-            <Footer />
-        </div>
+        </>
     );
 }

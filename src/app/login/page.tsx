@@ -4,8 +4,6 @@ import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { useI18n } from '@/i18n';
 
 function LoginForm() {
@@ -156,8 +154,6 @@ function LoginForm() {
 export default function LoginPage() {
     return (
         <div className="min-h-screen flex flex-col">
-            <Navbar />
-
             <main className="flex-1 flex items-center justify-center py-20 px-4">
                 <Suspense fallback={
                     <div className="w-full max-w-md">
@@ -173,8 +169,6 @@ export default function LoginPage() {
                     <LoginForm />
                 </Suspense>
             </main>
-
-            <Footer />
         </div>
     );
 }
