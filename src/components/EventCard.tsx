@@ -38,13 +38,16 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
             transition={{ delay: index * 0.1, duration: 0.4 }}
         >
             <Link href={`/events/${event.id}`}>
-                <div className="card card-hover h-full group flex flex-col p-6">
+                <div className="card card-hover h-full group flex flex-col p-6 relative overflow-hidden">
+                    {/* Hover Glow */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-brand-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
                     {/* Header with Date Badge and Status */}
-                    <div className="flex items-start gap-4 mb-4">
+                    <div className="flex items-start gap-4 mb-4 relative z-10">
                         {/* Date Badge */}
-                        <div className="flex-shrink-0 w-16 h-16 bg-brand-600/20 rounded-2xl flex flex-col items-center justify-center border border-brand-600/30">
-                            <span className="text-2xl font-bold text-brand-400">{day}</span>
-                            <span className="text-xs text-brand-400 uppercase">{month}</span>
+                        <div className="flex-shrink-0 w-16 h-16 bg-brand-600/10 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center border border-brand-600/20 group-hover:border-brand-600/40 transition-colors">
+                            <span className="text-2xl font-bold text-brand-400 group-hover:text-brand-300 transition-colors">{day}</span>
+                            <span className="text-xs text-brand-400/80 uppercase mb-1">{month}</span>
                         </div>
 
                         <div className="flex-1 min-w-0">

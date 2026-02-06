@@ -147,8 +147,9 @@ export default function HomePage() {
             <section className="pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden">
                 {/* Background decorations */}
                 <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-brand-600/20 rounded-full blur-3xl" />
-                    <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-brand-600/10 rounded-full blur-3xl" />
+                    <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-brand-600/20 rounded-full blur-3xl animate-blob" />
+                    <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-brand-600/10 rounded-full blur-3xl animate-blob animation-delay-2000" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-600/5 rounded-full blur-[100px] animate-pulse-soft" />
                 </div>
 
                 <div className="container-main relative">
@@ -156,19 +157,22 @@ export default function HomePage() {
                         initial="hidden"
                         animate="visible"
                         variants={staggerContainer}
-                        className="max-w-3xl mx-auto text-center"
+                        className="max-w-4xl mx-auto text-center"
                     >
                         <motion.h1
                             variants={fadeInUp}
-                            className="heading-display text-text-primary mb-6"
+                            className="heading-display text-text-primary mb-8"
                         >
                             {c.heroTitle}{' '}
-                            <span className="text-gradient">{c.heroHighlight}</span>
+                            <span className="text-gradient relative inline-block">
+                                {c.heroHighlight}
+                                <svg className="absolute w-full h-3 -bottom-1 left-0 text-brand-600 opacity-60" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.7538 4.77341 55.292 2.05263 88.9416 2.00021C117.478 1.95604 148.887 2.37943 194.258 5.67919" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
+                            </span>
                         </motion.h1>
 
                         <motion.p
                             variants={fadeInUp}
-                            className="text-lg md:text-xl text-text-secondary mb-10 max-w-2xl mx-auto"
+                            className="text-lg md:text-2xl text-text-secondary mb-12 max-w-2xl mx-auto leading-relaxed"
                         >
                             {c.heroSubtitle}
                         </motion.p>
@@ -177,13 +181,13 @@ export default function HomePage() {
                             variants={fadeInUp}
                             className="flex flex-col sm:flex-row gap-4 justify-center"
                         >
-                            <Link href="/events" className="btn btn-primary text-base px-8 py-3">
+                            <Link href="/events" className="btn btn-primary text-base px-8 py-4 shadow-button hover:shadow-glow hover:-translate-y-1 transition-all duration-300">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 {c.viewEvents}
                             </Link>
-                            <Link href="/resources" className="btn btn-secondary text-base px-8 py-3">
+                            <Link href="/resources" className="btn btn-secondary text-base px-8 py-4 hover:bg-white/10 hover:-translate-y-1 transition-all duration-300">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                 </svg>
@@ -197,7 +201,7 @@ export default function HomePage() {
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
-                        className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6"
+                        className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-6"
                     >
                         {[
                             { value: stats?.totalEvents ?? '-', label: lang === 'uz' ? 'Tadbirlar' : 'Events' },
@@ -205,9 +209,9 @@ export default function HomePage() {
                             { value: stats?.totalResources ?? '-', label: lang === 'uz' ? 'Resurslar' : 'Resources' },
                             { value: stats?.totalVideos ?? '-', label: lang === 'uz' ? 'Videolar' : 'Videos' },
                         ].map((stat, i) => (
-                            <div key={i} className="text-center p-6 rounded-2xl bg-white/5 border border-white/10">
-                                <div className="text-3xl md:text-4xl font-bold text-brand-400 mb-1">{stat.value}</div>
-                                <div className="text-sm text-text-muted">{stat.label}</div>
+                            <div key={i} className="text-center p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors duration-300">
+                                <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-brand-400 to-brand-600 mb-2">{stat.value}</div>
+                                <div className="text-sm font-medium text-text-muted uppercase tracking-wider">{stat.label}</div>
                             </div>
                         ))}
                     </motion.div>

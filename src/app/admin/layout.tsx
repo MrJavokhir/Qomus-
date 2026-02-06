@@ -61,7 +61,7 @@ export default function AdminLayout({
         <div className="min-h-screen bg-dark-bg text-text-primary">
             <ToastProvider>
                 <AdminSidebar />
-                <div className="ml-64 flex flex-col min-h-screen">
+                <div className="ml-72 flex flex-col min-h-screen">
                     <AdminTopBar />
                     <main className="flex-1 pt-24 pb-12 px-8">
                         {children}

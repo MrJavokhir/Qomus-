@@ -64,7 +64,7 @@ export default function Navbar() {
         <motion.nav
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass py-3' : 'bg-transparent py-4'
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass py-3 shadow-glass' : 'bg-transparent py-4'
                 }`}
         >
             <div className="container-main">
@@ -84,8 +84,8 @@ export default function Navbar() {
                                 key={link.href}
                                 href={link.href}
                                 className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-colors ${pathname === link.href
-                                        ? 'text-text-primary'
-                                        : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                                    ? 'text-text-primary'
+                                    : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
                                     }`}
                             >
                                 {link.label}
@@ -201,8 +201,8 @@ export default function Navbar() {
                                         href={link.href}
                                         onClick={() => setIsMenuOpen(false)}
                                         className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${pathname === link.href
-                                                ? 'bg-brand-600/20 text-brand-400'
-                                                : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                                            ? 'bg-brand-600/20 text-brand-400'
+                                            : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
                                             }`}
                                     >
                                         {link.label}

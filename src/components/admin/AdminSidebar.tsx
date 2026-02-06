@@ -63,36 +63,38 @@ export default function AdminSidebar() {
     const { lang } = useI18n();
 
     return (
-        <aside className="fixed left-0 top-0 h-full w-64 glass border-r border-white/10 p-6 flex flex-col z-50">
-            <div className="mb-10 flex items-center gap-2 px-2">
-                <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">Q</span>
+        <aside className="fixed left-0 top-0 h-full w-72 glass border-r border-white/10 p-6 flex flex-col z-50 backdrop-blur-xl">
+            <div className="mb-10 flex items-center gap-3 px-2">
+                <div className="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-600/30">
+                    <span className="text-white font-bold text-lg">Q</span>
                 </div>
-                <span className="text-xl font-bold text-text-primary">Qomus Admin</span>
+                <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">Qomus Admin</span>
             </div>
 
-            <nav className="space-y-1.5 flex-1">
+            <nav className="space-y-1.5 flex-1 overflow-y-auto custom-scrollbar">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href;
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                ? 'bg-brand-600/20 text-brand-400'
-                                : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                            className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group relative ${isActive
+                                ? 'text-white'
+                                : 'text-text-secondary hover:text-white hover:bg-white/5'
                                 }`}
                         >
-                            <span className={`${isActive ? 'text-brand-400' : 'text-text-muted group-hover:text-text-primary'}`}>
-                                {item.icon}
-                            </span>
-                            <span className="text-sm font-medium">{lang === 'uz' ? item.uz : item.label}</span>
                             {isActive && (
                                 <motion.div
                                     layoutId="sidebar-active"
-                                    className="ml-auto w-1 h-4 bg-brand-600 rounded-full"
+                                    className="absolute inset-0 bg-brand-600 rounded-xl shadow-lg shadow-brand-600/20"
+                                    initial={false}
+                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                 />
                             )}
+                            <span className={`relative z-10 ${isActive ? 'text-white' : 'text-text-muted group-hover:text-white transition-colors'}`}>
+                                {item.icon}
+                            </span>
+                            <span className="relative z-10 text-sm font-medium">{lang === 'uz' ? item.uz : item.label}</span>
                         </Link>
                     );
                 })}
