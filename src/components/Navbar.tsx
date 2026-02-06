@@ -200,6 +200,7 @@ export default function Navbar() {
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         className="md:hidden p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-text-primary transition-colors"
+                        aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
                     >
                         <div className="w-6 h-5 relative flex flex-col justify-between">
                             <span className={`w-full h-0.5 bg-current rounded-full transition-transform duration-300 ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
@@ -209,75 +210,114 @@ export default function Navbar() {
                     </button>
                 </div>
 
-                {/* Mobile Menu */}
+                {/* Mobile Menu - Full screen overlay */}
                 <AnimatePresence>
                     {isMenuOpen && (
                         <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="md:hidden overflow-hidden"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="md:hidden fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] bg-white dark:bg-slate-900"
+                            style={{ height: '100dvh' }}
                         >
-                            <div className="pt-4 pb-2 flex flex-col gap-2">
+                            {/* Header with logo and close button */}
+                            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-white/10">
+                                <Link href="/" className="flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
+                                    <div className="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center">
+                                        <span className="text-white font-display font-bold text-xl">Q</span>
+                                    </div>
+                                    <span className="text-xl font-display font-bold text-text-primary">Qomus</span>
+                                </Link>
+                                <button
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="p-2 rounded-xl bg-slate-100 dark:bg-white/10 text-text-primary"
+                                    aria-label="Close menu"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Navigation Links */}
+                            <div className="p-4 flex flex-col gap-2">
                                 {navLinks.map((link) => (
                                     <Link
                                         key={link.href}
                                         href={link.href}
                                         onClick={() => setIsMenuOpen(false)}
-                                        className={`px-4 py-3 rounded-xl text-base font-medium transition-all ${pathname === link.href
+                                        className={`px-4 py-4 rounded-xl text-lg font-medium transition-all ${pathname === link.href
                                             ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-600'
-                                            : 'text-text-secondary hover:text-text-primary hover:bg-black/5 dark:hover:bg-white/5'
+                                            : 'text-text-secondary hover:text-text-primary hover:bg-slate-100 dark:hover:bg-white/5'
                                             }`}
                                     >
                                         {link.label}
                                     </Link>
                                 ))}
 
-                                <hr className="my-2 border-dashed border-black/10 dark:border-white/10" />
+                                <hr className="my-4 border-slate-200 dark:border-white/10" />
 
-                                <div className="flex items-center justify-between px-4 py-2">
+                                {/* Settings row */}
+                                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-white/5 rounded-xl">
                                     <span className="text-sm font-medium text-text-muted">{t.common.language}</span>
                                     <div className="flex gap-2">
                                         <button
                                             onClick={toggleLang}
-                                            className="px-3 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 text-sm font-medium"
+                                            className="px-4 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-sm font-bold"
                                         >
                                             {lang === 'uz' ? 'UZ' : 'EN'}
                                         </button>
                                         <button
                                             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                                            className="p-1.5 rounded-lg bg-black/5 dark:bg-white/5"
+                                            className="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-xl"
+                                            aria-label="Toggle theme"
                                         >
                                             {theme === 'dark' ? '🌙' : '☀️'}
                                         </button>
                                     </div>
                                 </div>
 
-                                {user ? (
-                                    <div className="space-y-1 px-2">
+                                {/* Auth section */}
+                                <div className="mt-4">
+                                    {user ? (
+                                        <div className="space-y-2">
+                                            <div className="px-4 py-3 bg-slate-50 dark:bg-white/5 rounded-xl">
+                                                <p className="font-medium text-text-primary">{user.username}</p>
+                                                <p className="text-xs text-text-muted">Student</p>
+                                            </div>
+                                            <Link
+                                                href="/dashboard"
+                                                onClick={() => setIsMenuOpen(false)}
+                                                className="block px-4 py-4 rounded-xl text-base font-medium text-text-secondary hover:bg-slate-100 dark:hover:bg-white/5"
+                                            >
+                                                {t.nav.dashboard}
+                                            </Link>
+                                            {user.role === 'ADMIN' && (
+                                                <Link
+                                                    href="/admin"
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                    className="block px-4 py-4 rounded-xl text-base font-medium text-text-secondary hover:bg-slate-100 dark:hover:bg-white/5"
+                                                >
+                                                    {t.nav.admin}
+                                                </Link>
+                                            )}
+                                            <button
+                                                onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+                                                className="w-full text-left px-4 py-4 rounded-xl text-base font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
+                                            >
+                                                {t.auth.logout}
+                                            </button>
+                                        </div>
+                                    ) : (
                                         <Link
-                                            href="/dashboard"
+                                            href="/login"
                                             onClick={() => setIsMenuOpen(false)}
-                                            className="block px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:bg-black/5 dark:hover:bg-white/5"
+                                            className="btn btn-primary w-full justify-center py-4 text-base"
                                         >
-                                            {t.nav.dashboard}
+                                            {t.auth.login}
                                         </Link>
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
-                                        >
-                                            {t.auth.logout}
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <Link
-                                        href="/login"
-                                        onClick={() => setIsMenuOpen(false)}
-                                        className="btn btn-primary w-full justify-center mt-2"
-                                    >
-                                        {t.auth.login}
-                                    </Link>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         </motion.div>
                     )}
