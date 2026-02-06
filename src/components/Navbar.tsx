@@ -101,165 +101,203 @@ export default function Navbar() {
 
                     {/* Right side */}
                     <div className="hidden md:flex items-center gap-3">
+// ... imports ...
+                        import {useTheme} from "next-themes";
+                        // ... existing imports
+
+                        export default function Navbar() {
+    const {t, lang, toggleLang} = useI18n();
+                        const {theme, setTheme} = useTheme();
+                        // ... existing ...
+
+                        // ... inside return ...
                         {/* Language Toggle */}
-                        <button
-                            onClick={toggleLang}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm font-medium transition-all hover:bg-white/10"
-                        >
-                            <span className={lang === 'uz' ? 'text-text-primary' : 'text-text-muted'}>UZ</span>
-                            <span className="text-text-muted">/</span>
-                            <span className={lang === 'en' ? 'text-text-primary' : 'text-text-muted'}>EN</span>
-                        </button>
-
-                        {user ? (
-                            <div className="relative">
-                                <button
-                                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
-                                >
-                                    <div className="w-7 h-7 bg-brand-600 rounded-lg flex items-center justify-center">
-                                        <span className="text-white text-xs font-bold">
-                                            {user.username[0].toUpperCase()}
-                                        </span>
-                                    </div>
-                                    <span className="text-sm font-medium text-text-primary">{user.username}</span>
-                                    <svg className={`w-4 h-4 text-text-muted transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                                className="p-2 rounded-lg bg-white/5 border border-white/10 text-text-muted hover:text-text-primary hover:bg-white/10 transition-all"
+                                aria-label="Toggle theme"
+                            >
+                                <span className="sr-only">Toggle theme</span>
+                                <div className="relative w-5 h-5 flex items-center justify-center">
+                                    <svg
+                                        className={`absolute w-5 h-5 transition-all ${theme === 'dark' ? 'scale-100 rotate-0' : 'scale-0 -rotate-90'}`}
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                                     </svg>
-                                </button>
+                                    <svg
+                                        className={`absolute w-5 h-5 transition-all ${theme === 'light' ? 'scale-100 rotate-0' : 'scale-0 rotate-90'}`}
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                </div>
+                            </button>
 
-                                <AnimatePresence>
-                                    {isUserMenuOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                                            className="absolute right-0 mt-2 w-48 py-2 glass rounded-xl border border-white/10"
+                            <button
+                                onClick={toggleLang}
+                                // ... rest of the code
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm font-medium transition-all hover:bg-white/10"
+                            >
+                                <span className={lang === 'uz' ? 'text-text-primary' : 'text-text-muted'}>UZ</span>
+                                <span className="text-text-muted">/</span>
+                                <span className={lang === 'en' ? 'text-text-primary' : 'text-text-muted'}>EN</span>
+                            </button>
+
+                            {user ? (
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                                        className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                                    >
+                                        <div className="w-7 h-7 bg-brand-600 rounded-lg flex items-center justify-center">
+                                            <span className="text-white text-xs font-bold">
+                                                {user.username[0].toUpperCase()}
+                                            </span>
+                                        </div>
+                                        <span className="text-sm font-medium text-text-primary">{user.username}</span>
+                                        <svg className={`w-4 h-4 text-text-muted transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+
+                                    <AnimatePresence>
+                                        {isUserMenuOpen && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                                                className="absolute right-0 mt-2 w-48 py-2 glass rounded-xl border border-white/10"
+                                            >
+                                                <Link
+                                                    href="/dashboard"
+                                                    className="block px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-white/5"
+                                                    onClick={() => setIsUserMenuOpen(false)}
+                                                >
+                                                    {t.nav.dashboard}
+                                                </Link>
+                                                {user.role === 'ADMIN' && (
+                                                    <Link
+                                                        href="/admin"
+                                                        className="block px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-white/5"
+                                                        onClick={() => setIsUserMenuOpen(false)}
+                                                    >
+                                                        {t.nav.admin}
+                                                    </Link>
+                                                )}
+                                                <hr className="my-2 border-white/10" />
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="w-full text-left px-4 py-2 text-sm text-status-red hover:bg-white/5"
+                                                >
+                                                    {t.auth.logout}
+                                                </button>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            ) : (
+                                <Link href="/login" className="btn btn-primary text-sm">
+                                    {t.auth.login}
+                                </Link>
+                            )}
+                        </div>
+
+                        {/* Mobile menu button */}
+                        <button
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            className="md:hidden p-2 rounded-lg hover:bg-white/5"
+                        >
+                            <svg className="w-6 h-6 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {isMenuOpen ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                ) : (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                )}
+                            </svg>
+                        </button>
+                    </div>
+
+                    {/* Mobile Menu */}
+                    <AnimatePresence>
+                        {isMenuOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="md:hidden mt-4 pb-4 border-t border-white/10 pt-4"
+                            >
+                                <div className="flex flex-col gap-1">
+                                    {navLinks.map((link) => (
+                                        <Link
+                                            key={link.href}
+                                            href={link.href}
+                                            onClick={() => setIsMenuOpen(false)}
+                                            className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${pathname === link.href
+                                                ? 'bg-brand-600/20 text-brand-400'
+                                                : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                                                }`}
                                         >
+                                            {link.label}
+                                        </Link>
+                                    ))}
+
+                                    <hr className="my-3 border-white/10" />
+
+                                    <div className="flex items-center justify-between px-4">
+                                        <span className="text-sm text-text-muted">{t.common.language}</span>
+                                        <button
+                                            onClick={toggleLang}
+                                            className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm font-medium"
+                                        >
+                                            {lang === 'uz' ? 'O\'zbekcha' : 'English'}
+                                        </button>
+                                    </div>
+
+                                    {user ? (
+                                        <>
                                             <Link
                                                 href="/dashboard"
-                                                className="block px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-white/5"
-                                                onClick={() => setIsUserMenuOpen(false)}
+                                                onClick={() => setIsMenuOpen(false)}
+                                                className="px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:bg-white/5"
                                             >
                                                 {t.nav.dashboard}
                                             </Link>
                                             {user.role === 'ADMIN' && (
                                                 <Link
                                                     href="/admin"
-                                                    className="block px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-white/5"
-                                                    onClick={() => setIsUserMenuOpen(false)}
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                    className="px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:bg-white/5"
                                                 >
                                                     {t.nav.admin}
                                                 </Link>
                                             )}
-                                            <hr className="my-2 border-white/10" />
                                             <button
                                                 onClick={handleLogout}
-                                                className="w-full text-left px-4 py-2 text-sm text-status-red hover:bg-white/5"
+                                                className="px-4 py-3 rounded-xl text-sm font-medium text-status-red text-left hover:bg-white/5"
                                             >
                                                 {t.auth.logout}
                                             </button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        ) : (
-                            <Link href="/login" className="btn btn-primary text-sm">
-                                {t.auth.login}
-                            </Link>
-                        )}
-                    </div>
-
-                    {/* Mobile menu button */}
-                    <button
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="md:hidden p-2 rounded-lg hover:bg-white/5"
-                    >
-                        <svg className="w-6 h-6 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            {isMenuOpen ? (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            ) : (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            )}
-                        </svg>
-                    </button>
-                </div>
-
-                {/* Mobile Menu */}
-                <AnimatePresence>
-                    {isMenuOpen && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="md:hidden mt-4 pb-4 border-t border-white/10 pt-4"
-                        >
-                            <div className="flex flex-col gap-1">
-                                {navLinks.map((link) => (
-                                    <Link
-                                        key={link.href}
-                                        href={link.href}
-                                        onClick={() => setIsMenuOpen(false)}
-                                        className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${pathname === link.href
-                                            ? 'bg-brand-600/20 text-brand-400'
-                                            : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
-                                            }`}
-                                    >
-                                        {link.label}
-                                    </Link>
-                                ))}
-
-                                <hr className="my-3 border-white/10" />
-
-                                <div className="flex items-center justify-between px-4">
-                                    <span className="text-sm text-text-muted">{t.common.language}</span>
-                                    <button
-                                        onClick={toggleLang}
-                                        className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm font-medium"
-                                    >
-                                        {lang === 'uz' ? 'O\'zbekcha' : 'English'}
-                                    </button>
-                                </div>
-
-                                {user ? (
-                                    <>
+                                        </>
+                                    ) : (
                                         <Link
-                                            href="/dashboard"
+                                            href="/login"
                                             onClick={() => setIsMenuOpen(false)}
-                                            className="px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:bg-white/5"
+                                            className="btn btn-primary mx-4 mt-2"
                                         >
-                                            {t.nav.dashboard}
+                                            {t.auth.login}
                                         </Link>
-                                        {user.role === 'ADMIN' && (
-                                            <Link
-                                                href="/admin"
-                                                onClick={() => setIsMenuOpen(false)}
-                                                className="px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:bg-white/5"
-                                            >
-                                                {t.nav.admin}
-                                            </Link>
-                                        )}
-                                        <button
-                                            onClick={handleLogout}
-                                            className="px-4 py-3 rounded-xl text-sm font-medium text-status-red text-left hover:bg-white/5"
-                                        >
-                                            {t.auth.logout}
-                                        </button>
-                                    </>
-                                ) : (
-                                    <Link
-                                        href="/login"
-                                        onClick={() => setIsMenuOpen(false)}
-                                        className="btn btn-primary mx-4 mt-2"
-                                    >
-                                        {t.auth.login}
-                                    </Link>
-                                )}
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
         </motion.nav>
     );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/i18n";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({
     subsets: ["latin", "cyrillic"],
@@ -23,7 +24,14 @@ export default function RootLayout({
         <html lang="uz" suppressHydrationWarning>
             <body className={`${inter.variable} font-sans antialiased`}>
                 <I18nProvider>
-                    {children}
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        {children}
+                    </ThemeProvider>
                 </I18nProvider>
             </body>
         </html>

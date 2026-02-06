@@ -144,12 +144,13 @@ export default function HomePage() {
             <Navbar />
 
             {/* Hero Section */}
-            <section className="pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden">
+            <section className="pt-32 pb-20 md:pt-48 md:pb-32 relative overflow-hidden bg-hero-gradient">
                 {/* Background decorations */}
                 <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-brand-600/20 rounded-full blur-3xl animate-blob" />
-                    <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-brand-600/10 rounded-full blur-3xl animate-blob animation-delay-2000" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-600/5 rounded-full blur-[100px] animate-pulse-soft" />
+                    <div className="absolute inset-0 bg-grid-pattern opacity-10 [mask-image:linear-gradient(to_bottom,white,transparent)]" />
+                    <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-brand-400/30 rounded-full blur-3xl animate-blob mix-blend-multiply dark:mix-blend-normal dark:bg-brand-600/20" />
+                    <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-brand-500/30 rounded-full blur-3xl animate-blob animation-delay-2000 mix-blend-multiply dark:mix-blend-normal dark:bg-brand-600/10" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-400/10 rounded-full blur-[100px] animate-pulse-soft dark:bg-brand-600/5" />
                 </div>
 
                 <div className="container-main relative">
@@ -157,16 +158,24 @@ export default function HomePage() {
                         initial="hidden"
                         animate="visible"
                         variants={staggerContainer}
-                        className="max-w-4xl mx-auto text-center"
+                        className="max-w-5xl mx-auto text-center relative z-10"
                     >
+                        <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50/50 dark:bg-brand-900/30 border border-brand-200 dark:border-brand-700/50 text-brand-600 dark:text-brand-300 text-sm font-medium mb-6 backdrop-blur-sm">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+                            </span>
+                            Qomus 2.0
+                        </motion.div>
+
                         <motion.h1
                             variants={fadeInUp}
-                            className="heading-display text-text-primary mb-8"
+                            className="heading-display text-text-primary mb-8 leading-tight"
                         >
                             {c.heroTitle}{' '}
-                            <span className="text-gradient relative inline-block">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-brand-400 dark:from-brand-400 dark:to-brand-600 relative inline-block">
                                 {c.heroHighlight}
-                                <svg className="absolute w-full h-3 -bottom-1 left-0 text-brand-600 opacity-60" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.7538 4.77341 55.292 2.05263 88.9416 2.00021C117.478 1.95604 148.887 2.37943 194.258 5.67919" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
+                                <svg className="absolute w-full h-3 -bottom-2 left-0 text-brand-500/20 dark:text-brand-400/20" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.7538 4.77341 55.292 2.05263 88.9416 2.00021C117.478 1.95604 148.887 2.37943 194.258 5.67919" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
                             </span>
                         </motion.h1>
 
@@ -181,14 +190,16 @@ export default function HomePage() {
                             variants={fadeInUp}
                             className="flex flex-col sm:flex-row gap-4 justify-center"
                         >
-                            <Link href="/events" className="btn btn-primary text-base px-8 py-4 shadow-button hover:shadow-glow hover:-translate-y-1 transition-all duration-300">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
+                            <Link href="/events" className="btn btn-primary text-base px-8 py-4 shadow-button hover:shadow-glow hover:-translate-y-1 transition-all duration-300 group">
+                                <span className="group-hover:translate-x-1 transition-transform inline-block">
+                                    <svg className="w-5 h-5 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </span>
                                 {c.viewEvents}
                             </Link>
-                            <Link href="/resources" className="btn btn-secondary text-base px-8 py-4 hover:bg-white/10 hover:-translate-y-1 transition-all duration-300">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <Link href="/resources" className="btn btn-secondary text-base px-8 py-4 hover:bg-white/10 dark:hover:bg-white/5 hover:-translate-y-1 transition-all duration-300">
+                                <svg className="w-5 h-5 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                 </svg>
                                 {c.viewResources}
@@ -201,7 +212,7 @@ export default function HomePage() {
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
-                        className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-6"
+                        className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-6 relative z-10"
                     >
                         {[
                             { value: stats?.totalEvents ?? '-', label: lang === 'uz' ? 'Tadbirlar' : 'Events' },
@@ -209,17 +220,21 @@ export default function HomePage() {
                             { value: stats?.totalResources ?? '-', label: lang === 'uz' ? 'Resurslar' : 'Resources' },
                             { value: stats?.totalVideos ?? '-', label: lang === 'uz' ? 'Videolar' : 'Videos' },
                         ].map((stat, i) => (
-                            <div key={i} className="text-center p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors duration-300">
-                                <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-brand-400 to-brand-600 mb-2">{stat.value}</div>
-                                <div className="text-sm font-medium text-text-muted uppercase tracking-wider">{stat.label}</div>
-                            </div>
+                            <motion.div
+                                key={i}
+                                whileHover={{ y: -5 }}
+                                className="text-center p-8 rounded-3xl bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 backdrop-blur-md shadow-xl dark:shadow-none transition-all duration-300"
+                            >
+                                <div className="text-4xl md:text-5xl font-bold text-brand-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-br dark:from-brand-400 dark:to-brand-600 mb-2">{stat.value}</div>
+                                <div className="text-sm font-semibold text-text-muted uppercase tracking-wider">{stat.label}</div>
+                            </motion.div>
                         ))}
                     </motion.div>
                 </div>
             </section>
 
             {/* Upcoming Events Section */}
-            <section className="section bg-dark-surface/30">
+            <section className="section bg-surface dark:bg-dark-surface/30 transition-colors">
                 <div className="container-main">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -228,7 +243,7 @@ export default function HomePage() {
                         className="flex items-center justify-between mb-8"
                     >
                         <h2 className="heading-2 text-text-primary">{c.upcomingEvents}</h2>
-                        <Link href="/events" className="text-sm text-brand-400 hover:text-brand-300 flex items-center gap-1">
+                        <Link href="/events" className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-1 font-medium">
                             {c.viewAll}
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -239,7 +254,7 @@ export default function HomePage() {
                     {loading ? (
                         <div className="grid md:grid-cols-3 gap-6">
                             {[1, 2, 3].map((i) => (
-                                <div key={i} className="card p-6">
+                                <div key={i} className="card p-6 border border-border shadow-card">
                                     <div className="skeleton h-14 w-14 rounded-xl mb-4" />
                                     <div className="skeleton h-4 w-20 rounded mb-3" />
                                     <div className="skeleton h-6 w-full rounded mb-2" />
@@ -260,7 +275,7 @@ export default function HomePage() {
             </section>
 
             {/* Resources Section */}
-            <section className="section">
+            <section className="section bg-bg transition-colors">
                 <div className="container-main">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -269,7 +284,7 @@ export default function HomePage() {
                         className="flex items-center justify-between mb-8"
                     >
                         <h2 className="heading-2 text-text-primary">{c.latestResources}</h2>
-                        <Link href="/resources" className="text-sm text-brand-400 hover:text-brand-300 flex items-center gap-1">
+                        <Link href="/resources" className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-1 font-medium">
                             {c.viewAll}
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -332,7 +347,7 @@ export default function HomePage() {
             </section>
 
             {/* Videos Section */}
-            <section className="section bg-dark-surface/30">
+            <section className="section bg-surface dark:bg-dark-surface/30 transition-colors">
                 <div className="container-main">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -341,7 +356,7 @@ export default function HomePage() {
                         className="flex items-center justify-between mb-8"
                     >
                         <h2 className="heading-2 text-text-primary">{c.latestVideos}</h2>
-                        <Link href="/videos" className="text-sm text-brand-400 hover:text-brand-300 flex items-center gap-1">
+                        <Link href="/videos" className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-1 font-medium">
                             {c.viewAll}
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -352,7 +367,7 @@ export default function HomePage() {
                     {loading ? (
                         <div className="grid md:grid-cols-3 gap-6">
                             {[1, 2, 3].map((i) => (
-                                <div key={i} className="card">
+                                <div key={i} className="card border border-border shadow-card">
                                     <div className="skeleton h-40 rounded-t-2xl" />
                                     <div className="p-4">
                                         <div className="skeleton h-6 w-full rounded mb-2" />
@@ -370,11 +385,11 @@ export default function HomePage() {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: i * 0.1 }}
-                                    className="card card-hover overflow-hidden group"
+                                    className="card card-hover overflow-hidden group border border-border shadow-card bg-card"
                                 >
-                                    <div className="relative h-40 bg-dark-surface flex items-center justify-center">
+                                    <div className="relative h-40 bg-surface dark:bg-dark-surface flex items-center justify-center">
                                         <div className="w-16 h-16 rounded-full bg-brand-600/20 flex items-center justify-center group-hover:bg-brand-600/40 transition-colors">
-                                            <svg className="w-8 h-8 text-brand-400 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-8 h-8 text-brand-600 dark:text-brand-400 ml-1" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M8 5v14l11-7z" />
                                             </svg>
                                         </div>
@@ -385,7 +400,7 @@ export default function HomePage() {
                                         )}
                                     </div>
                                     <div className="p-4">
-                                        <h3 className="font-semibold text-text-primary mb-1 line-clamp-2 group-hover:text-brand-400 transition-colors">
+                                        <h3 className="font-semibold text-text-primary mb-1 line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                                             {getLocalizedContent(video, 'title', lang)}
                                         </h3>
                                         <p className="text-sm text-text-muted line-clamp-2">
