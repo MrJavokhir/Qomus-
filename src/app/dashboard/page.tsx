@@ -13,6 +13,7 @@ interface Registration {
     teamName: string;
     membersCount: number;
     ratingStatus: string;
+    decisionStatus: string;
     createdAt: string;
     event: {
         id: string;
@@ -62,14 +63,14 @@ export default function DashboardPage() {
         fetchData();
     }, [router]);
 
-    const getRatingBadge = (status: string) => {
+    const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'GREEN':
-                return <span className="badge badge-green">{t.rating.green}</span>;
-            case 'YELLOW':
-                return <span className="badge badge-yellow">{t.rating.yellow}</span>;
-            case 'RED':
-                return <span className="badge badge-red">{t.rating.red}</span>;
+            case 'ACCEPTED':
+                return <span className="badge badge-green">{t.status.accepted}</span>;
+            case 'PENDING':
+                return <span className="badge badge-yellow">{t.status.pending}</span>;
+            case 'DECLINED':
+                return <span className="badge badge-red">{t.status.rejected}</span>;
             default:
                 return <span className="badge badge-yellow">{status}</span>;
         }
@@ -118,7 +119,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="grid md:grid-cols-3 gap-6 mb-8"
+                        className="grid md:grid-cols-4 gap-6 mb-8"
                     >
                         <div className="card card-hover p-6 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-600/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all duration-300 group-hover:bg-brand-600/10" />
@@ -144,9 +145,9 @@ export default function DashboardPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-text-muted font-medium mb-1">{t.rating.green}</p>
+                                    <p className="text-sm text-text-muted font-medium mb-1">{t.status.accepted}</p>
                                     <p className="text-3xl font-bold text-text-primary">
-                                        {registrations.filter(r => r.ratingStatus === 'GREEN').length}
+                                        {registrations.filter(r => r.decisionStatus === 'ACCEPTED').length}
                                     </p>
                                 </div>
                             </div>
@@ -161,9 +162,26 @@ export default function DashboardPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-text-muted font-medium mb-1">{lang === 'uz' ? 'Kutilmoqda' : 'Pending'}</p>
+                                    <p className="text-sm text-text-muted font-medium mb-1">{t.status.pending}</p>
                                     <p className="text-3xl font-bold text-text-primary">
-                                        {registrations.filter(r => r.ratingStatus === 'YELLOW').length}
+                                        {registrations.filter(r => r.decisionStatus === 'PENDING').length}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="card card-hover p-6 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-status-red/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all duration-300 group-hover:bg-status-red/10" />
+                            <div className="flex items-center gap-4 relative">
+                                <div className="w-14 h-14 bg-status-red/10 rounded-2xl flex items-center justify-center text-status-red group-hover:scale-110 transition-transform duration-300">
+                                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-text-muted font-medium mb-1">{t.status.rejected}</p>
+                                    <p className="text-3xl font-bold text-text-primary">
+                                        {registrations.filter(r => r.decisionStatus === 'DECLINED').length}
                                     </p>
                                 </div>
                             </div>
@@ -210,7 +228,7 @@ export default function DashboardPage() {
                                             <th className="text-left py-5 px-6 text-xs font-semibold uppercase tracking-wider text-text-muted">{t.registration.teamName}</th>
                                             <th className="text-left py-5 px-6 text-xs font-semibold uppercase tracking-wider text-text-muted">{t.nav.events}</th>
                                             <th className="text-left py-5 px-6 text-xs font-semibold uppercase tracking-wider text-text-muted">{t.registration.membersCount}</th>
-                                            <th className="text-left py-5 px-6 text-xs font-semibold uppercase tracking-wider text-text-muted">{t.admin.rating}</th>
+                                            <th className="text-left py-5 px-6 text-xs font-semibold uppercase tracking-wider text-text-muted">{lang === 'uz' ? 'Holat' : 'Status'}</th>
                                             <th className="text-left py-5 px-6 text-xs font-semibold uppercase tracking-wider text-text-muted">{t.events.date}</th>
                                         </tr>
                                     </thead>
@@ -235,7 +253,7 @@ export default function DashboardPage() {
                                                     </Link>
                                                 </td>
                                                 <td className="py-5 px-6 text-text-secondary">{reg.membersCount}</td>
-                                                <td className="py-5 px-6">{getRatingBadge(reg.ratingStatus)}</td>
+                                                <td className="py-5 px-6">{getStatusBadge(reg.decisionStatus)}</td>
                                                 <td className="py-5 px-6 text-text-muted text-sm font-mono">
                                                     {new Date(reg.createdAt).toLocaleDateString(lang === 'uz' ? 'uz-UZ' : 'en-US')}
                                                 </td>

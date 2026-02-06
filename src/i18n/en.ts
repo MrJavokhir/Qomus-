@@ -154,6 +154,13 @@ const en = {
         yellow: "Yellow",
         red: "Red",
     },
+
+    // Decision statuses
+    status: {
+        pending: "Pending",
+        accepted: "Accepted",
+        rejected: "Rejected",
+    },
 };
 
 export default en;

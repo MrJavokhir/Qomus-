@@ -154,6 +154,13 @@ const uz = {
         yellow: "Sariq",
         red: "Qizil",
     },
+
+    // Decision statuses
+    status: {
+        pending: "Kutilmoqda",
+        accepted: "Qabul qilindi",
+        rejected: "Rad etildi",
+    },
 };
 
 export default uz;
