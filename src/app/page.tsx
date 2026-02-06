@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import EventCard from '@/components/EventCard';
+import Typewriter from '@/components/Typewriter';
 import { useI18n, getLocalizedContent } from '@/i18n';
 
 interface Event {
@@ -67,6 +68,12 @@ export default function HomePage() {
     const [videos, setVideos] = useState<Video[]>([]);
     const [stats, setStats] = useState<HomeStats | null>(null);
     const [loading, setLoading] = useState(true);
+    const [highlightStart, setHighlightStart] = useState(false);
+
+    // Reset animation on language change
+    useEffect(() => {
+        setHighlightStart(false);
+    }, [lang]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -172,18 +179,35 @@ export default function HomePage() {
                             </span>
                         </motion.div>
 
-                        {/* Title */}
                         <motion.h1
                             variants={fadeInUp}
                             className="heading-display mb-8"
                         >
-                            {c.heroTitle}{' '}
+                            <Typewriter
+                                text={c.heroTitle}
+                                onComplete={() => setHighlightStart(true)}
+                                key={`title-${lang}`}
+                                showCursor={!highlightStart}
+                            />{' '}
                             <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-brand-500 to-indigo-500 dark:from-brand-400 dark:via-brand-300 dark:to-indigo-300">
-                                {c.heroHighlight}
+                                <Typewriter
+                                    text={c.heroHighlight}
+                                    trigger={highlightStart}
+                                    key={`highlight-${lang}`}
+                                    showCursor={true}
+                                />
                                 {/* Underline decoration */}
-                                <svg className="absolute w-[110%] h-4 -bottom-2 -left-[5%] text-brand-500/30 dark:text-brand-400/30 -z-10" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <motion.svg
+                                    initial={{ opacity: 0, scaleX: 0 }}
+                                    animate={{ opacity: highlightStart ? 1 : 0, scaleX: highlightStart ? 1 : 0 }}
+                                    transition={{ duration: 0.8, delay: 0.2 }}
+                                    className="absolute w-[110%] h-4 -bottom-2 -left-[5%] text-brand-500/30 dark:text-brand-400/30 -z-10 origin-left"
+                                    viewBox="0 0 200 9"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
                                     <path d="M2.00025 6.99997C25.7538 4.77341 55.292 2.05263 88.9416 2.00021C117.478 1.95604 148.887 2.37943 194.258 5.67919" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                                </svg>
+                                </motion.svg>
                             </span>
                         </motion.h1>
 
