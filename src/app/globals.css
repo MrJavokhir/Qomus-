@@ -266,6 +266,110 @@ body::after {
   .dark .badge-red {
     @apply bg-red-500/10 text-red-400 border-red-500/20;
   }
+
+  .badge-brand {
+    @apply bg-brand-50 text-brand-700 border border-brand-200;
+  }
+
+  .dark .badge-brand {
+    @apply bg-brand-500/10 text-brand-400 border-brand-500/20;
+  }
+
+  /* SELECT */
+  .select,
+  select.input {
+    @apply w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500;
+    @apply cursor-pointer appearance-none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  .dark .select,
+  .dark select.input {
+    @apply bg-slate-800/50 border-white/10 text-white;
+    @apply focus:border-brand-400 focus:ring-brand-400/20;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  }
+
+  /* TABLE STYLES */
+  .table-container {
+    @apply bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm;
+  }
+
+  .dark .table-container {
+    @apply bg-slate-800/40 border-white/5 shadow-none;
+  }
+
+  .table-header {
+    @apply bg-slate-50;
+  }
+
+  .dark .table-header {
+    @apply bg-white/5;
+  }
+
+  .table-header-row {
+    @apply text-slate-600 text-xs font-bold uppercase tracking-wider border-b border-slate-200;
+  }
+
+  .dark .table-header-row {
+    @apply text-slate-400 border-white/5;
+  }
+
+  .table-body {
+    @apply divide-y divide-slate-100;
+  }
+
+  .dark .table-body {
+    @apply divide-white/5;
+  }
+
+  .table-row {
+    @apply hover:bg-slate-50 transition-colors;
+  }
+
+  .dark .table-row {
+    @apply hover:bg-white/5;
+  }
+
+  /* ACTION BUTTONS (Icon buttons in tables) */
+  .action-btn {
+    @apply p-2 rounded-lg bg-slate-100 text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition-colors;
+  }
+
+  .dark .action-btn {
+    @apply bg-white/5 text-slate-400 hover:text-brand-400 hover:bg-white/10;
+  }
+
+  .action-btn-danger {
+    @apply p-2 rounded-lg bg-slate-100 text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors;
+  }
+
+  .dark .action-btn-danger {
+    @apply bg-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10;
+  }
+
+  /* FILE DISPLAY BOX */
+  .file-display {
+    @apply flex-1 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 truncate;
+  }
+
+  .dark .file-display {
+    @apply bg-white/5 border-white/10 text-slate-400;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    @apply w-full bg-slate-200 rounded-full h-1 overflow-hidden;
+  }
+
+  .dark .progress-bar {
+    @apply bg-white/5;
+  }
 }
 
 @layer utilities {

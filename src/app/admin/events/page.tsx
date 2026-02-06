@@ -222,7 +222,7 @@ export default function AdminEvents() {
                 <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-text-primary outline-none focus:border-brand-600 transition-all font-medium"
+                    className="input"
                 >
                     <option value="">All Status</option>
                     <option value="UPCOMING">Upcoming</option>
@@ -230,11 +230,11 @@ export default function AdminEvents() {
                 </select>
             </div>
 
-            <div className="card border-white/10 overflow-hidden">
+            <div className="table-container">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5">
-                            <tr className="text-text-muted text-xs font-bold uppercase tracking-wider border-b border-white/5">
+                        <thead className="table-header">
+                            <tr className="table-header-row">
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Nomi' : 'Title'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Sana' : 'Date'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Joy' : 'Location'}</th>
@@ -242,9 +242,9 @@ export default function AdminEvents() {
                                 <th className="py-4 px-6 text-right">{lang === 'uz' ? 'Amallar' : 'Actions'}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="table-body">
                             {events.map((event) => (
-                                <tr key={event.id} className="hover:bg-white/5 transition-colors group">
+                                <tr key={event.id} className="table-row group">
                                     <td className="py-4 px-6">
                                         <p className="font-semibold text-text-primary text-sm line-clamp-1">{getLocalizedContent(event, 'title', lang)}</p>
                                     </td>
@@ -258,12 +258,12 @@ export default function AdminEvents() {
                                     </td>
                                     <td className="py-4 px-6 text-right">
                                         <div className="flex justify-end gap-2">
-                                            <button onClick={() => handleEdit(event)} className="p-2 rounded-lg bg-white/5 text-text-muted hover:text-brand-400 transition-colors">
+                                            <button onClick={() => handleEdit(event)} className="action-btn">
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                 </svg>
                                             </button>
-                                            <button onClick={() => handleDelete(event.id)} className="p-2 rounded-lg bg-white/5 text-text-muted hover:text-status-red transition-colors">
+                                            <button onClick={() => handleDelete(event.id)} className="action-btn-danger">
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
@@ -282,7 +282,7 @@ export default function AdminEvents() {
                 onClose={() => setIsFormOpen(false)}
                 title={editingEvent?.id ? (lang === 'uz' ? 'Tadbirni tahrirlash' : 'Edit Event') : (lang === 'uz' ? 'Yangi tadbir' : 'Add Event')}
             >
-                <div className="flex p-1 bg-white/5 border border-white/10 rounded-xl mb-6">
+                <div className="flex p-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl mb-6">
                     <button
                         onClick={() => setActiveTab('info')}
                         className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${activeTab === 'info' ? 'bg-brand-600 text-white shadow-glow' : 'text-text-muted hover:text-text-primary'}`}
@@ -418,7 +418,7 @@ export default function AdminEvents() {
                             {/* Cover Image */}
                             <div className="space-y-3">
                                 <label className="text-xs font-bold text-text-muted uppercase tracking-wider">{lang === 'uz' ? 'Muqova Rasmi' : 'Cover Image'}</label>
-                                <div className="aspect-video w-full rounded-2xl bg-white/5 border-2 border-dashed border-white/10 overflow-hidden relative group hover:border-brand-600/50 transition-all">
+                                <div className="aspect-video w-full rounded-2xl bg-slate-100 dark:bg-white/5 border-2 border-dashed border-slate-300 dark:border-white/10 overflow-hidden relative group hover:border-brand-600/50 transition-all">
                                     {editingEvent?.coverImageUrl ? (
                                         <>
                                             <img src={editingEvent.coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
@@ -463,7 +463,7 @@ export default function AdminEvents() {
 
                                 <div className="grid grid-cols-3 gap-2">
                                     {(editingEvent?.gallery || []).map((img, idx) => (
-                                        <div key={img.id} className="aspect-square rounded-xl bg-white/5 overflow-hidden relative group">
+                                        <div key={img.id} className="aspect-square rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden relative group">
                                             <img src={img.imageUrl} alt="" className="w-full h-full object-cover" />
                                             <button
                                                 type="button"
@@ -483,7 +483,7 @@ export default function AdminEvents() {
                                         </div>
                                     ))}
                                     {uploadingMedia === 'gallery' && (
-                                        <div className="aspect-square rounded-xl bg-white/5 flex items-center justify-center border-2 border-dashed border-white/10">
+                                        <div className="aspect-square rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center border-2 border-dashed border-slate-300 dark:border-white/10">
                                             <div className="w-5 h-5 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
                                         </div>
                                     )}

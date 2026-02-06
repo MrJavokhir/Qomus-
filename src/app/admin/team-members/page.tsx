@@ -179,7 +179,7 @@ export default function AdminTeam() {
             </div>
 
             {/* Team Section Editor */}
-            <div className="card border-white/10 p-6">
+            <div className="card p-6">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="font-semibold text-text-primary">
                         {lang === 'uz' ? "Bo'lim matni" : 'Section Text'}
@@ -269,11 +269,11 @@ export default function AdminTeam() {
                 )}
             </div>
 
-            <div className="card border-white/10 overflow-hidden">
+            <div className="table-container">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5">
-                            <tr className="text-text-muted text-xs font-bold uppercase tracking-wider border-b border-white/5">
+                        <thead className="table-header">
+                            <tr className="table-header-row">
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Rasm' : 'Photo'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'F.I.O' : 'Full Name'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Lavozim' : 'Position'}</th>
@@ -282,11 +282,11 @@ export default function AdminTeam() {
                                 <th className="py-4 px-6 text-right">{lang === 'uz' ? 'Amallar' : 'Actions'}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="table-body">
                             {members.map((member) => (
-                                <tr key={member.id} className="hover:bg-white/5 transition-colors group">
+                                <tr key={member.id} className="table-row">
                                     <td className="py-4 px-6">
-                                        <div className="w-10 h-10 rounded-full bg-white/10 overflow-hidden">
+                                        <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
                                             {member.photoUrl ? (
                                                 <img src={member.photoUrl} alt="" className="w-full h-full object-cover" />
                                             ) : (
@@ -304,12 +304,12 @@ export default function AdminTeam() {
                                     </td>
                                     <td className="py-4 px-6 text-right">
                                         <div className="flex justify-end gap-2">
-                                            <button onClick={() => handleEdit(member)} className="p-2 rounded-lg bg-white/5 text-text-muted hover:text-brand-400 transition-colors">
+                                            <button onClick={() => handleEdit(member)} className="action-btn">
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                 </svg>
                                             </button>
-                                            <button onClick={() => handleDelete(member.id)} className="p-2 rounded-lg bg-white/5 text-text-muted hover:text-status-red transition-colors">
+                                            <button onClick={() => handleDelete(member.id)} className="action-btn-danger">
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
@@ -368,7 +368,7 @@ export default function AdminTeam() {
                         <div className="space-y-3">
                             <div className="flex items-center gap-4">
                                 {editingMember?.photoUrl && (
-                                    <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
+                                    <div className="w-20 h-20 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 overflow-hidden flex-shrink-0">
                                         <img
                                             src={editingMember.photoUrl}
                                             alt="Preview"
@@ -413,7 +413,7 @@ export default function AdminTeam() {
                                     />
                                     <label
                                         htmlFor="photo-upload"
-                                        className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-sm"
+                                        className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-sm"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -443,7 +443,7 @@ export default function AdminTeam() {
                             <select
                                 value={editingMember?.status || 'VISIBLE'}
                                 onChange={(e) => setEditingMember({ ...editingMember, status: e.target.value as any })}
-                                className="input w-full bg-dark-bg"
+                                className="input"
                             >
                                 <option value="VISIBLE">Visible</option>
                                 <option value="HIDDEN">Hidden</option>
@@ -451,7 +451,7 @@ export default function AdminTeam() {
                         </div>
                     </div>
 
-                    <div className="space-y-4 pt-4 border-t border-white/10">
+                    <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-white/10">
                         <p className="text-xs font-bold text-text-muted uppercase tracking-wider">{lang === 'uz' ? 'Ijtimoiy tarmoqlar' : 'Social Links'}</p>
                         <div className="space-y-3">
                             <input

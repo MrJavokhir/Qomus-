@@ -153,7 +153,7 @@ export default function AdminRegistrations() {
                         onClick={() => setStatusFilter(status)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${statusFilter === status
                             ? 'bg-brand-600 text-white'
-                            : 'bg-white/5 text-text-muted hover:bg-white/10'
+                            : 'bg-slate-100 dark:bg-white/5 text-text-muted hover:bg-slate-200 dark:hover:bg-white/10'
                             }`}
                     >
                         {status || 'All'}
@@ -164,12 +164,12 @@ export default function AdminRegistrations() {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="card border-white/10 overflow-hidden"
+                className="table-container"
             >
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5">
-                            <tr className="text-text-muted text-xs font-bold uppercase tracking-wider border-b border-white/5">
+                        <thead className="table-header">
+                            <tr className="table-header-row">
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Jamoa' : 'Team'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Tadbir' : 'Event'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Soni' : 'Count'}</th>
@@ -179,14 +179,14 @@ export default function AdminRegistrations() {
                                 <th className="py-4 px-6 text-right">{t.admin.edit}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="table-body">
                             <AnimatePresence>
                                 {registrations.map((reg) => (
                                     <motion.tr
                                         key={reg.id}
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        className="hover:bg-white/5 transition-colors group"
+                                        className="table-row"
                                     >
                                         <td className="py-4 px-6">
                                             <p className="font-semibold text-text-primary text-sm">{reg.teamName}</p>
@@ -218,7 +218,7 @@ export default function AdminRegistrations() {
                                                     <select
                                                         value={editRating}
                                                         onChange={(e) => setEditRating(e.target.value as any)}
-                                                        className="bg-dark-bg border border-white/10 rounded-lg py-1 px-2 text-xs text-text-primary outline-none focus:border-brand-600"
+                                                        className="input text-xs py-1 px-2"
                                                         aria-label="Rating"
                                                     >
                                                         <option value="GREEN">{t.rating.green}</option>
@@ -230,7 +230,7 @@ export default function AdminRegistrations() {
                                                         placeholder="Notes..."
                                                         value={editNotes}
                                                         onChange={(e) => setEditNotes(e.target.value)}
-                                                        className="bg-dark-bg border border-white/10 rounded-lg py-1 px-2 text-xs text-text-primary outline-none focus:border-brand-600"
+                                                        className="input text-xs py-1 px-2"
                                                     />
                                                 </div>
                                             ) : (
@@ -256,7 +256,7 @@ export default function AdminRegistrations() {
                                                     </button>
                                                     <button
                                                         onClick={() => setEditingId(null)}
-                                                        className="w-8 h-8 rounded-lg bg-white/5 text-text-muted flex items-center justify-center hover:bg-white/10 transition-all"
+                                                        className="action-btn"
                                                         aria-label="Cancel"
                                                     >
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -290,7 +290,7 @@ export default function AdminRegistrations() {
                                                             setEditRating(reg.ratingStatus);
                                                             setEditNotes(reg.notes || '');
                                                         }}
-                                                        className="w-8 h-8 rounded-lg bg-white/5 text-text-muted flex items-center justify-center hover:bg-brand-600/20 hover:text-brand-400 transition-all"
+                                                        className="action-btn"
                                                         title="Edit Rating"
                                                     >
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

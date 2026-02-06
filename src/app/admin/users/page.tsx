@@ -89,11 +89,11 @@ export default function AdminUsers() {
                 </p>
             </div>
 
-            <div className="card border-white/10 overflow-hidden">
+            <div className="table-container">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5">
-                            <tr className="text-text-muted text-xs font-bold uppercase tracking-wider border-b border-white/5">
+                        <thead className="table-header">
+                            <tr className="table-header-row">
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Foydalanuvchi' : 'Username'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Rol' : 'Role'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Status' : 'Status'}</th>
@@ -101,9 +101,9 @@ export default function AdminUsers() {
                                 <th className="py-4 px-6 text-right">{lang === 'uz' ? 'Amallar' : 'Actions'}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="table-body">
                             {users.map((user) => (
-                                <tr key={user.id} className="hover:bg-white/5 transition-colors group">
+                                <tr key={user.id} className="table-row">
                                     <td className="py-4 px-6">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-lg bg-brand-600/20 text-brand-400 flex items-center justify-center font-bold text-xs uppercase">
@@ -117,7 +117,7 @@ export default function AdminUsers() {
                                             value={user.role}
                                             disabled={submitting === user.id}
                                             onChange={(e) => handleUpdate(user.id, { role: e.target.value as any })}
-                                            className="bg-dark-bg border border-white/10 rounded-lg py-1 px-2 text-xs text-text-primary outline-none focus:border-brand-600 appearance-none pr-6 font-medium cursor-pointer"
+                                            className="input text-xs py-1 px-2 pr-6 cursor-pointer"
                                         >
                                             <option value="MEMBER">MEMBER</option>
                                             <option value="ADMIN">ADMIN</option>
@@ -139,7 +139,7 @@ export default function AdminUsers() {
                                         <button
                                             onClick={() => handleDelete(user.id)}
                                             disabled={submitting === user.id}
-                                            className="p-2 rounded-lg bg-white/5 text-text-muted hover:text-status-red transition-colors"
+                                            className="action-btn-danger"
                                             title="Delete User"
                                         >
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

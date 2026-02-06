@@ -182,11 +182,11 @@ export default function AdminVideos() {
                 </button>
             </div>
 
-            <div className="card border-white/10 overflow-hidden">
+            <div className="table-container">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5">
-                            <tr className="text-text-muted text-xs font-bold uppercase tracking-wider border-b border-white/5">
+                        <thead className="table-header">
+                            <tr className="table-header-row">
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Video' : 'Video'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Nomi' : 'Title'}</th>
                                 <th className="py-4 px-6">{lang === 'uz' ? 'Davomiyligi' : 'Duration'}</th>
@@ -194,9 +194,9 @@ export default function AdminVideos() {
                                 <th className="py-4 px-6 text-right">{lang === 'uz' ? 'Amallar' : 'Actions'}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="table-body">
                             {videos.map((video) => (
-                                <tr key={video.id} className="hover:bg-white/5 transition-colors group">
+                                <tr key={video.id} className="table-row group">
                                     <td className="py-4 px-6">
                                         <div className="w-16 h-10 rounded-lg bg-dark-bg overflow-hidden relative group-hover:ring-2 ring-brand-600 transition-all">
                                             {getYoutubeId(video.videoUrl) ? (
@@ -223,12 +223,12 @@ export default function AdminVideos() {
                                     </td>
                                     <td className="py-4 px-6 text-right">
                                         <div className="flex justify-end gap-2">
-                                            <button onClick={() => handleEdit(video)} className="p-2 rounded-lg bg-white/5 text-text-muted hover:text-brand-400 transition-colors">
+                                            <button onClick={() => handleEdit(video)} className="action-btn">
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                 </svg>
                                             </button>
-                                            <button onClick={() => handleDelete(video.id)} className="p-2 rounded-lg bg-white/5 text-text-muted hover:text-status-red transition-colors">
+                                            <button onClick={() => handleDelete(video.id)} className="action-btn-danger">
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
@@ -293,7 +293,7 @@ export default function AdminVideos() {
 
                     <div className="space-y-4">
                         <label className="text-xs font-bold text-text-muted uppercase tracking-wider">{lang === 'uz' ? 'Video Manbasi' : 'Video Source'}</label>
-                        <div className="flex p-1 bg-white/5 border border-white/10 rounded-xl">
+                        <div className="flex p-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl">
                             <button
                                 type="button"
                                 onClick={() => setEditingVideo({ ...editingVideo, sourceType: 'URL', videoUrl: '' })}
@@ -327,7 +327,7 @@ export default function AdminVideos() {
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-text-muted uppercase tracking-wider">{lang === 'uz' ? 'MP4 Fayl' : 'MP4 File'}</label>
                             <div className="flex items-center gap-4">
-                                <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-text-secondary truncate">
+                                <div className="file-display">
                                     {editingVideo?.videoUrl || (lang === 'uz' ? 'Fayl yuklanmagan' : 'No file uploaded')}
                                 </div>
                                 <input
@@ -342,7 +342,7 @@ export default function AdminVideos() {
                                 </label>
                             </div>
                             {uploading && (
-                                <div className="w-full bg-white/5 rounded-full h-1 mt-2 overflow-hidden">
+                                <div className="progress-bar mt-2">
                                     <motion.div
                                         className="h-full bg-brand-600"
                                         initial={{ width: 0 }}
@@ -357,7 +357,7 @@ export default function AdminVideos() {
                     )}
 
                     {editingVideo?.videoUrl && (
-                        <div className="aspect-video w-full rounded-xl overflow-hidden bg-black/40 border border-white/10 ring-1 ring-brand-600/30">
+                        <div className="aspect-video w-full rounded-xl overflow-hidden bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 ring-1 ring-brand-600/30">
                             {editingVideo.sourceType === 'URL' && getYoutubeId(editingVideo.videoUrl) ? (
                                 <iframe
                                     width="100%"
