@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18n } from '@/i18n';
+import { useTheme } from 'next-themes';
 
 interface User {
     id: string;
@@ -14,6 +15,7 @@ interface User {
 
 export default function Navbar() {
     const { t, lang, toggleLang } = useI18n();
+    const { theme, setTheme } = useTheme();
     const pathname = usePathname();
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
@@ -101,16 +103,6 @@ export default function Navbar() {
 
                     {/* Right side */}
                     <div className="hidden md:flex items-center gap-3">
-// ... imports ...
-                        import {useTheme} from "next-themes";
-                        // ... existing imports
-
-                        export default function Navbar() {
-    const {t, lang, toggleLang} = useI18n();
-                        const {theme, setTheme} = useTheme();
-                        // ... existing ...
-
-                        // ... inside return ...
                         {/* Language Toggle */}
                         <div className="flex items-center gap-2">
                             <button
@@ -207,97 +199,98 @@ export default function Navbar() {
                                 </Link>
                             )}
                         </div>
-
-                        {/* Mobile menu button */}
-                        <button
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="md:hidden p-2 rounded-lg hover:bg-white/5"
-                        >
-                            <svg className="w-6 h-6 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                {isMenuOpen ? (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                ) : (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                )}
-                            </svg>
-                        </button>
                     </div>
 
-                    {/* Mobile Menu */}
-                    <AnimatePresence>
-                        {isMenuOpen && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="md:hidden mt-4 pb-4 border-t border-white/10 pt-4"
-                            >
-                                <div className="flex flex-col gap-1">
-                                    {navLinks.map((link) => (
+                    {/* Mobile menu button */}
+                    <button
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className="md:hidden p-2 rounded-lg hover:bg-white/5"
+                    >
+                        <svg className="w-6 h-6 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {isMenuOpen ? (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            ) : (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                            )}
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Mobile Menu */}
+                <AnimatePresence>
+                    {isMenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="md:hidden mt-4 pb-4 border-t border-white/10 pt-4"
+                        >
+                            <div className="flex flex-col gap-1">
+                                {navLinks.map((link) => (
+                                    <Link
+                                        key={link.href}
+                                        href={link.href}
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${pathname === link.href
+                                            ? 'bg-brand-600/20 text-brand-400'
+                                            : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                                            }`}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
+
+                                <hr className="my-3 border-white/10" />
+
+                                <div className="flex items-center justify-between px-4">
+                                    <span className="text-sm text-text-muted">{t.common.language}</span>
+                                    <button
+                                        onClick={toggleLang}
+                                        className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm font-medium"
+                                    >
+                                        {lang === 'uz' ? 'O\'zbekcha' : 'English'}
+                                    </button>
+                                </div>
+
+                                {user ? (
+                                    <>
                                         <Link
-                                            key={link.href}
-                                            href={link.href}
+                                            href="/dashboard"
                                             onClick={() => setIsMenuOpen(false)}
-                                            className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${pathname === link.href
-                                                ? 'bg-brand-600/20 text-brand-400'
-                                                : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
-                                                }`}
+                                            className="px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:bg-white/5"
                                         >
-                                            {link.label}
+                                            {t.nav.dashboard}
                                         </Link>
-                                    ))}
-
-                                    <hr className="my-3 border-white/10" />
-
-                                    <div className="flex items-center justify-between px-4">
-                                        <span className="text-sm text-text-muted">{t.common.language}</span>
-                                        <button
-                                            onClick={toggleLang}
-                                            className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm font-medium"
-                                        >
-                                            {lang === 'uz' ? 'O\'zbekcha' : 'English'}
-                                        </button>
-                                    </div>
-
-                                    {user ? (
-                                        <>
+                                        {user.role === 'ADMIN' && (
                                             <Link
-                                                href="/dashboard"
+                                                href="/admin"
                                                 onClick={() => setIsMenuOpen(false)}
                                                 className="px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:bg-white/5"
                                             >
-                                                {t.nav.dashboard}
+                                                {t.nav.admin}
                                             </Link>
-                                            {user.role === 'ADMIN' && (
-                                                <Link
-                                                    href="/admin"
-                                                    onClick={() => setIsMenuOpen(false)}
-                                                    className="px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:bg-white/5"
-                                                >
-                                                    {t.nav.admin}
-                                                </Link>
-                                            )}
-                                            <button
-                                                onClick={handleLogout}
-                                                className="px-4 py-3 rounded-xl text-sm font-medium text-status-red text-left hover:bg-white/5"
-                                            >
-                                                {t.auth.logout}
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <Link
-                                            href="/login"
-                                            onClick={() => setIsMenuOpen(false)}
-                                            className="btn btn-primary mx-4 mt-2"
+                                        )}
+                                        <button
+                                            onClick={handleLogout}
+                                            className="px-4 py-3 rounded-xl text-sm font-medium text-status-red text-left hover:bg-white/5"
                                         >
-                                            {t.auth.login}
-                                        </Link>
-                                    )}
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                                            {t.auth.logout}
+                                        </button>
+                                    </>
+                                ) : (
+                                    <Link
+                                        href="/login"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="btn btn-primary mx-4 mt-2"
+                                    >
+                                        {t.auth.login}
+                                    </Link>
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
         </motion.nav>
     );
 }
